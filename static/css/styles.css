@@ -53,9 +53,35 @@ a:hover, a:focus {
 	font-weight:700;
 }
 
+.no-padding {
+	padding: 0;
+}
+
+/* main content area */
 .left-border {
 	border-left: 1px solid #ccc;
+	padding-left:30px !important;
 }
+
+.category-heading {
+	padding-top:20px;
+	clear: both;
+}
+
+.product-thumb {
+	float:left;
+	padding-right:20px;
+	padding-bottom:30px;
+}
+
+.product-thumb img {
+	width:250px;
+	height:250px;
+	border:5px white solid;
+	outline:1px solid #ccc;
+	margin-bottom:10px;
+}
+
 
 .photo-display {
 	height: 200px;

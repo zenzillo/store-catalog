@@ -26,7 +26,7 @@
 			<span class="small-heading">Categories</span>
 			<ul class="nav flex-column">
 			  <li class="nav-item">
-			    <a class="nav-link active" href="{{url_for('showCategory', category_id = 0)}}">All</a>
+			    <a class="nav-link active" href="{{url_for('showCatalog')}}">All</a>
 			  </li>
 			{% for category in categories %}
 			  <li class="nav-item">
@@ -36,10 +36,18 @@
 			</ul>
 		</div>
 		<div class="col-md-10 left-border">
-			<span class="small-heading">Products</span>
-			<p>This is the product area.</p>
+			<span class="small-heading no-padding">Products</span><br>
+			{% set current_category = {'id': 0} %}
 			{% for product in products %}
-			{{product.name}} ({{product.category.name}})<br>
+				{% if current_category['id'] != product.category_id %}
+			<h2 class="category-heading">{{product.category.name}}</h2>
+				{% if current_category.update({'id': product.category_id}) %}
+				{% endif %}
+				{% endif %}
+				<div class="product-thumb">
+					<img src="#"><br>
+					{{product.name}}
+				</div>
 			{% endfor %}
 		</div>
 	</div>

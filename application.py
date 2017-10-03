@@ -24,7 +24,7 @@ APPLICATION_NAME = "Catalog Application"
 
 # Connect to Database and create database session
 #engine = create_engine('sqlite:///restaurantmenu.db')
-engine = create_engine('postgresql+psycopg2:///storeproducts')
+engine = create_engine('postgresql+psycopg2:///mystore')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -291,15 +291,14 @@ def restaurantsJSON():
 @app.route('/')
 def showCatalog():
     categories = session.query(Category).order_by(asc(Category.name))
-    products = session.query(Product).join(Product.category).with_entities(Product.category.id).order_by(Product.category.id, Product.id).all()
+    products = session.query(Product).order_by(Product.category_id, Product.name).all()
     return render_template('category/list.html', categories=categories, products=products)
 
 @app.route('/category/<int:category_id>', methods=['GET', 'POST'])
 def showCategory(category_id):
-    category = session.query(Category).filter_by(id=category_id).first()
+    categories = session.query(Category).order_by(asc(Category.name))
     products = session.query(Product).filter_by(category_id=category_id).order_by(asc(Product.name))
-    print(category.name)
-    return render_template('category/details.html', category=category, products=products)
+    return render_template('category/list.html', category_id=category_id, categories=categories, products=products)
 
 
 # Create a new restaurant

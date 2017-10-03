@@ -77,7 +77,7 @@ class ProductPhoto(Base):
        }
 
 #engine = create_engine('sqlite:///restaurantmenuwithusers.db')
-engine = create_engine('postgresql+psycopg2:///storeproducts')
+engine = create_engine('postgresql+psycopg2:///mystore')
 
 
 Base.metadata.create_all(engine)

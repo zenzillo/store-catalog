@@ -37,7 +37,11 @@
 		{% endfor %}
     </ul>
     <div class="form-inline my-2 my-lg-0">
-      <a href="/logout">Logout</a>
+		{%if 'username' not in session %}
+			<a href="{{url_for('showLogin')}}">Click Here to Login </a>
+		{% else %}
+			<a href="{{url_for('disconnect')}}">Logout {{ session.username }}</a>
+		{% endif %}
     </div>
   </div>
 </nav>
@@ -60,8 +64,6 @@
 
 {% block content %}{% endblock %}
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 
 </body>
 
