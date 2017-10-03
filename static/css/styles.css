@@ -6,6 +6,27 @@ a:hover, a:focus {
 	text-decoration: none;
 }
 
+/* login */
+.container-position {
+	position: relative;
+	height: 30rem;
+}
+.border-box {
+	position: absolute;
+	border:1px solid #ccc;
+	margin-top:50px;
+	width:400px;
+	padding:30px;
+	background-color: #fff;
+	top: 50%;
+	left:50%;
+	transform: translate(-50%,-50%);
+}
+.bg-shaded {
+	background-color: #eee;
+}
+
+/* navigation */
 .navbar-brand {
   font-family: Lobster, sans-serif;
   font-size: 24px;

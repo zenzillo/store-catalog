@@ -2,28 +2,51 @@
 <html>
 <head>
 
-  <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
-   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
-  </script>
+	<!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script src="//apis.google.com/js/platform.js?onload=start"> </script>
+	<!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
 
-<script src="//apis.google.com/js/platform.js?onload=start"> </script>
+	<!-- LOAD STYLES AND FONTS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>-->
+	<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/styles.css') }}">
 
-<!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
 </head>
-<body>
+<body class="bg-shaded">
 
-<!-- GOOGLE PLUS SIGN IN BUTTON-->
-        <div id="signInButton">
-          <span class="g-signin"
-            data-scope="openid email"
-            data-clientid="84129083350-40feaijo3v768nu49bcq0pbseo1ohn9h.apps.googleusercontent.com"
-            data-redirecturi="postmessage"
-            data-accesstype="offline"
-            data-cookiepolicy="single_host_origin"
-            data-callback="signInCallback"
-            data-approvalprompt="force">
-          </span>
-        </div>
+
+<div class="container container-position">
+	<div class="d-flex flex-column align-items-center border-box">
+		<div class="p-2">
+	        <h1>Login</h1>
+	    </div>
+	    <div class="p-2">
+			<!-- GOOGLE PLUS SIGN IN BUTTON-->
+	        <div id="signInButton">
+	          <span class="g-signin"
+	            data-scope="openid email"
+	            data-clientid="84129083350-40feaijo3v768nu49bcq0pbseo1ohn9h.apps.googleusercontent.com"
+	            data-redirecturi="postmessage"
+	            data-accesstype="offline"
+	            data-cookiepolicy="single_host_origin"
+	            data-callback="signInCallback"
+	            data-approvalprompt="force">
+	          </span>
+	        </div>
+	    </div>
+	    <div class="p-2">
+	    	<!-- FACEBOOK SIGN IN BUTTON-->
+	        <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
+				<a href='javascript:sendTokenToServer()'>Login with Facebook</a>
+			</fb:login-button>
+	    </div>
+	</div>
+</div>
+
+
+
 
 <div id="result"></div>
 
@@ -115,11 +138,7 @@ function signInCallback(authResult) {
   }
 </script>
 
-	<button>
-        <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
-			<a href='javascript:sendTokenToServer()'>Login with Facebook</a>
-		</fb:login-button>
-	</button>
+
 
 <!--END FACEBOOK SIGN IN -->
   </body>
