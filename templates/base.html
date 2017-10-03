@@ -38,9 +38,9 @@
     </ul>
     <div class="form-inline my-2 my-lg-0">
 		{%if 'username' not in session %}
-			<a href="{{url_for('showLogin')}}">Click Here to Login </a>
+			<a href="{{url_for('showLogin')}}" class="btn btn-sm align-middle btn-outline-info" role="button">Click Here to Login </a>
 		{% else %}
-			<a href="{{url_for('disconnect')}}">Logout {{ session.username }}</a>
+			<a href="{{url_for('disconnect')}}" class="btn btn-sm align-middle btn-outline-secondary" role="button">Logout {{ session.username }}</a>
 		{% endif %}
     </div>
   </div>
