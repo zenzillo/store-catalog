@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Restaurant, MenuItem, User
+from database_setup import Base, Category, Product, ProductPhoto, User
 from flask import session as login_session
 import random
 import string
@@ -19,7 +19,7 @@ app = Flask(__name__)
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
-APPLICATION_NAME = "Restaurant Menu Application"
+APPLICATION_NAME = "Catalog Application"
 
 
 # Connect to Database and create database session
@@ -287,29 +287,28 @@ def restaurantsJSON():
     return jsonify(restaurants=[r.serialize for r in restaurants])
 
 
-# Show all restaurants
+# Show all categories
 @app.route('/')
-@app.route('/restaurant/')
-def showRestaurants():
-    restaurants = session.query(Restaurant).order_by(asc(Restaurant.name))
+@app.route('/category/')
+def showCategory():
+    categories = session.query(Category).order_by(asc(Category.name))
     if 'username' not in login_session:
-        return render_template('publicrestaurants.html', restaurants=restaurants)
+        return render_template('category/list.html', categories=categories)
     else:
-        return render_template('restaurants.html', restaurants=restaurants)
+        return render_template('category/list.html', categories=categories)
+
 
 # Create a new restaurant
-
-
 @app.route('/restaurant/new/', methods=['GET', 'POST'])
-def newRestaurant():
+def newCategory():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
-        newRestaurant = Restaurant(name=request.form['name'], user_id=login_session['user_id'])
-        session.add(newRestaurant)
-        flash('New Restaurant %s Successfully Created' % newRestaurant.name)
+        newCategory = Category(name=request.form['name'], user_id=login_session['user_id'])
+        session.add(newCategory)
+        flash('New Restaurant %s Successfully Created' % newCategory.name)
         session.commit()
-        return redirect(url_for('showRestaurants'))
+        return redirect(url_for('showCategory'))
     else:
         return render_template('newRestaurant.html')
 

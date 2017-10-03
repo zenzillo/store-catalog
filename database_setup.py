@@ -40,7 +40,7 @@ class Product(Base):
     price = Column(String(8))
     sku = Column(String(50))
     status = Column(Integer)
-    category_id = Column(Integer,ForeignKey('category.id'))
+    category_id = Column(Integer,ForeignKey('categories.id'))
     category = relationship(Category)
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship(User)
