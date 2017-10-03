@@ -1,0 +1,90 @@
+* {
+	font-family: Raleway, Roboto, Helvetica, Arial, sans-serif;
+}
+
+a:hover, a:focus {
+	text-decoration: none;
+}
+
+.navbar-brand {
+  font-family: Lobster, sans-serif;
+  font-size: 24px;
+}
+
+/* dropdown toggle arrow */
+.navbar .nav > li > .dropdown-menu::before {
+   position: absolute;
+   top: -7px;
+   left: 9px;
+   display: inline-block;
+   border-right: 7px solid transparent;
+   border-bottom: 7px solid #CCC;
+   border-left: 7px solid transparent;
+   border-bottom-color: rgba(0, 0, 0, 0.2);
+   content: '';
+ }
+ .navbar .nav > li > .dropdown-menu::after {
+    position: absolute;
+    top: -6px;
+    left: 10px;
+    display: inline-block;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid white;
+    border-left: 6px solid transparent;
+    content: '';
+  }
+  .dropdown-menu a {
+  	display:block;
+  	padding: 5px;
+  	text-decoration:none;
+  }
+
+.top-right-nav{
+	padding-top:15px;
+	padding-right:45px;
+}
+
+.container {
+	padding-top: 50px;
+}
+
+.small-heading {
+	padding-left:1em;
+	font-weight:700;
+}
+
+.left-border {
+	border-left: 1px solid #ccc;
+}
+
+.photo-display {
+	height: 200px;
+	padding: 0 0 20px 10px;
+}
+
+.required:after {
+   content:" *";
+   color:red;
+}
+
+/* alert-error same as alert-danger */
+.alert-error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+.alert-error hr {
+  border-top-color: #e4b9c0;
+}
+.alert-error .alert-link {
+  color: #843534;
+}
+
+/* invoices */
+.form-group ul {
+	list-style-type: none;
+}
+
+li label {
+	font-weight: normal;
+}

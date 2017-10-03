@@ -291,7 +291,8 @@ def restaurantsJSON():
 @app.route('/')
 def showCatalog():
     categories = session.query(Category).order_by(asc(Category.name))
-    return render_template('category/list.html', categories=categories)
+    products = session.query(Product).join(Product.category).with_entities(Product.category.id).order_by(Product.category.id, Product.id).all()
+    return render_template('category/list.html', categories=categories, products=products)
 
 @app.route('/category/<int:category_id>', methods=['GET', 'POST'])
 def showCategory(category_id):
