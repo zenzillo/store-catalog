@@ -289,28 +289,31 @@ def restaurantsJSON():
 
 # Show all categories
 @app.route('/')
-@app.route('/category/')
-def showCategory():
+def showCatalog():
     categories = session.query(Category).order_by(asc(Category.name))
-    if 'username' not in login_session:
-        return render_template('category/list.html', categories=categories)
-    else:
-        return render_template('category/list.html', categories=categories)
+    return render_template('category/list.html', categories=categories)
+
+@app.route('/category/<int:category_id>', methods=['GET', 'POST'])
+def showCategory(category_id):
+    category = session.query(Category).filter_by(id=category_id).first()
+    products = session.query(Product).filter_by(category_id=category_id).order_by(asc(Product.name))
+    print(category.name)
+    return render_template('category/details.html', category=category, products=products)
 
 
 # Create a new restaurant
-@app.route('/restaurant/new/', methods=['GET', 'POST'])
+@app.route('/category/new/', methods=['GET', 'POST'])
 def newCategory():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
         newCategory = Category(name=request.form['name'], user_id=login_session['user_id'])
         session.add(newCategory)
-        flash('New Restaurant %s Successfully Created' % newCategory.name)
+        flash('New Category %s Successfully Created' % newCategory.name)
         session.commit()
         return redirect(url_for('showCategory'))
     else:
-        return render_template('newRestaurant.html')
+        return render_template('category/new.html')
 
 # Edit a restaurant
 
@@ -349,9 +352,18 @@ def deleteRestaurant(restaurant_id):
     else:
         return render_template('deleteRestaurant.html', restaurant=restaurantToDelete)
 
+
+########################################
+# PRODUCTS
+########################################
+@app.route('/product/<int:product_id>/')
+def showProduct(product_id):
+    product = session.query(Product).filter_by(id=product_id).one()
+    return render_template('product/details.html', product=product)
+
+
+
 # Show a restaurant menu
-
-
 @app.route('/restaurant/<int:restaurant_id>/')
 @app.route('/restaurant/<int:restaurant_id>/menu/')
 def showMenu(restaurant_id):
@@ -448,10 +460,10 @@ def disconnect():
         del login_session['user_id']
         del login_session['provider']
         flash("You have successfully been logged out.")
-        return redirect(url_for('showRestaurants'))
+        return redirect(url_for('showCatalog'))
     else:
         flash("You were not logged in")
-        return redirect(url_for('showRestaurants'))
+        return redirect(url_for('showCatalog'))
 
 
 if __name__ == '__main__':
