@@ -27,7 +27,7 @@
 	        <div id="signInButton">
 	          <span class="g-signin"
 	            data-scope="openid email"
-	            data-clientid="84129083350-40feaijo3v768nu49bcq0pbseo1ohn9h.apps.googleusercontent.com"
+	            data-clientid="206214808032-usi0dp49iflt4tkq7r0m7o3em84nmcop.apps.googleusercontent.com"
 	            data-redirecturi="postmessage"
 	            data-accesstype="offline"
 	            data-cookiepolicy="single_host_origin"
@@ -42,20 +42,19 @@
 				<a href='javascript:sendTokenToServer()'>Login with Facebook</a>
 			</fb:login-button>
 	    </div>
+	    <div class="p-2">
+			<div id="result"></div>
+	    </div>
 	</div>
 </div>
 
-
-
-
-<div id="result"></div>
 
 <script>
 function signInCallback(authResult) {
   if (authResult['code']) {
     // Hide the sign-in button now that the user is authorized
     $('#signinButton').attr('style', 'display: none');
-    // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+    // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main home page
     $.ajax({
       type: 'POST',
       url: '/gconnect?state={{STATE}}',
@@ -67,7 +66,7 @@ function signInCallback(authResult) {
         if (result) {
           $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
          setTimeout(function() {
-          window.location.href = "/restaurant";
+          window.location.href = "/";
          }, 4000);
 
       } else if (authResult['error']) {
@@ -86,7 +85,7 @@ function signInCallback(authResult) {
 <script>
   window.fbAsyncInit = function() {
     FB.init({
-      appId      : '338150459940807',
+      appId      : '1922019807814240',
       cookie     : true,
       xfbml      : true,
       version    : 'v2.9'
@@ -125,7 +124,7 @@ function signInCallback(authResult) {
         if (result) {
           $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
          setTimeout(function() {
-          window.location.href = "/restaurant";
+          window.location.href = "/";
          }, 4000);
 
       } else {
