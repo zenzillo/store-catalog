@@ -3,11 +3,12 @@
 
 {% block content %}
 
- 	<div class="row">
-		<div class="col-md-10">
-			Breadcrumbs > Go > Here
-		</div>
-	</div>
+
+	<nav class="breadcrumb">
+	  <a class="breadcrumb-item" href="{{url_for('showCatalog') }}">Catalog</a>
+	  <a class="breadcrumb-item" href="{{url_for('showCategory', category_name = category.name) }}">{{category.name}}</a>
+	  <span class="breadcrumb-item active">{{product.name}}</span>
+	</nav>
 
  	<div class="row top-margin">
 		<div class="col-md-10">

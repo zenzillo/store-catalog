@@ -236,10 +236,10 @@ def newCategory():
 # Display product
 @app.route('/catalog/<category_name>/<product_name>', methods=['GET', 'POST'])
 def showProduct(category_name, product_name):
-    #category = session.query(Category).filter_by(name=category_name).first()
+    category = session.query(Category).filter_by(name=category_name).first()
     #categories = session.query(Category).order_by(asc(Category.name))
     product = session.query(Product).filter_by(name=product_name).first()
-    return render_template('product/detail.html', product=product)
+    return render_template('product/detail.html', product=product, category=category)
 
 
 # Edit a restaurant
