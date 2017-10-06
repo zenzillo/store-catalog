@@ -22,7 +22,7 @@
 		<div class="p-2">
 	        <h1>Login</h1>
 	    </div>
-	    <div class="p-2">
+	    <div class="p-2 top-margin">
 			<!-- GOOGLE PLUS SIGN IN BUTTON-->
 	        <div id="signInButton">
 	          <span class="g-signin"
@@ -36,14 +36,8 @@
 	          </span>
 	        </div>
 	    </div>
-	    <div class="p-2">
-	    	<!-- FACEBOOK SIGN IN BUTTON-->
-	        <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
-				<a href='javascript:sendTokenToServer()'>Login with Facebook</a>
-			</fb:login-button>
-	    </div>
-	    <div class="p-2">
-			<div id="result"></div>
+	    <div class="p-2 align-items-center">
+			<div id="result" class="text-center"></div>
 	    </div>
 	</div>
 </div>
@@ -78,67 +72,7 @@ function signInCallback(authResult) {
 
   }); } }
 </script>
-
 <!--END GOOGLE PLUS SIGN IN BUTTON -->
 
-<!--FACEBOOK SIGN IN -->
-<script>
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '1922019807814240',
-      cookie     : true,
-      xfbml      : true,
-      version    : 'v2.9'
-    });
-    FB.AppEvents.logPageView();
-    FB.Event.subscribe('auth.login', function(response) {
-        access_token = response.authResponse.accessToken;
-    });
-  };
-
-
-  // Load the SDK asynchronously
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-  // Here we run a very simple test of the Graph API after login is
-  // successful.  See statusChangeCallback() for when this call is made.
-  function sendTokenToServer() {
-    var access_token = FB.getAuthResponse()['accessToken'];
-    console.log(access_token)
-    console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function(response) {
-      console.log('Successful login for: ' + response.name);
-     $.ajax({
-      type: 'POST',
-      url: '/fbconnect?state={{STATE}}',
-      processData: false,
-      data: access_token,
-      contentType: 'application/octet-stream; charset=utf-8',
-      success: function(result) {
-        // Handle or verify the server response if necessary.
-        if (result) {
-          $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
-         setTimeout(function() {
-          window.location.href = "/";
-         }, 4000);
-
-      } else {
-        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
-         }
-      }
-
-  });
-    });
-  }
-</script>
-
-
-
-<!--END FACEBOOK SIGN IN -->
   </body>
   </html>

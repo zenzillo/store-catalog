@@ -15,8 +15,8 @@ a:hover, a:focus {
 	position: absolute;
 	border:1px solid #ccc;
 	margin-top:50px;
-	width:400px;
-	padding:30px;
+	width: 350px;
+	padding: 70px 50px;
 	background-color: #fff;
 	top: 50%;
 	left:50%;
@@ -78,6 +78,10 @@ a:hover, a:focus {
 	padding: 0;
 }
 
+.top-margin {
+	margin:50px;
+}
+
 /* main content area */
 .left-border {
 	border-left: 1px solid #ccc;
@@ -125,6 +129,19 @@ a:hover, a:focus {
 }
 .alert-error .alert-link {
   color: #843534;
+}
+
+/* alert-message same as alert-success */
+.alert-message {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+/* fix alert styles */
+.alert-dismissible .close {
+	top:-.20rem !important;
+	padding: 0 1.25rem !important;
 }
 
 /* invoices */
