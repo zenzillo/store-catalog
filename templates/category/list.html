@@ -28,7 +28,7 @@
 			  </li>
 			{% for category in categories %}
 			  <li class="nav-item">
-			    <a class="nav-link active" href="{{url_for('showCategory', category_id = category.id)}}">{{category.name}}</a>
+			    <a class="nav-link active" href="{{url_for('showCategory', category_name = category.name)}}">{{category.name}}</a>
 			  </li>
 			{% endfor %}
 			</ul>
@@ -43,8 +43,10 @@
 				{% endif %}
 				{% endif %}
 				<div class="product-thumb">
-					<img src="#"><br>
-					{{product.name}}
+					<a href="{{url_for('showProduct', category_name = product.category.name, product_name = product.name)}}">
+						<img src="http://via.placeholder.com/200x200"><br>
+						{{product.name}}
+					</a>
 				</div>
 			{% endfor %}
 		</div>

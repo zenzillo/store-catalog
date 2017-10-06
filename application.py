@@ -210,15 +210,16 @@ def showCatalog():
     products = session.query(Product).order_by(Product.category_id, Product.name).all()
     return render_template('category/list.html', categories=categories, products=products)
 
-@app.route('/category/<int:category_id>', methods=['GET', 'POST'])
-def showCategory(category_id):
+@app.route('/catalog/<category_name>/items', methods=['GET', 'POST'])
+def showCategory(category_name):
+    category = session.query(Category).filter_by(name=category_name).first()
     categories = session.query(Category).order_by(asc(Category.name))
-    products = session.query(Product).filter_by(category_id=category_id).order_by(asc(Product.name))
-    return render_template('category/list.html', category_id=category_id, categories=categories, products=products)
+    products = session.query(Product).filter_by(category_id=category.id).order_by(asc(Product.name))
+    return render_template('category/list.html', category_id=category.id, categories=categories, products=products)
 
 
-# Create a new restaurant
-@app.route('/category/new/', methods=['GET', 'POST'])
+# Create a new category
+@app.route('/catalog/new/', methods=['GET', 'POST'])
 def newCategory():
     if 'username' not in login_session:
         return redirect('/login')
@@ -227,13 +228,21 @@ def newCategory():
         session.add(newCategory)
         flash('New Category %s Successfully Created' % newCategory.name)
         session.commit()
-        return redirect(url_for('showCategory'))
+        return redirect(url_for('showCatalog'))
     else:
         return render_template('category/new.html')
 
+
+# Display product
+@app.route('/catalog/<category_name>/<product_name>', methods=['GET', 'POST'])
+def showProduct(category_name, product_name):
+    #category = session.query(Category).filter_by(name=category_name).first()
+    #categories = session.query(Category).order_by(asc(Category.name))
+    product = session.query(Product).filter_by(name=product_name).first()
+    return render_template('product/detail.html', product=product)
+
+
 # Edit a restaurant
-
-
 @app.route('/restaurant/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
 def editRestaurant(restaurant_id):
     editedRestaurant = session.query(
@@ -272,10 +281,7 @@ def deleteRestaurant(restaurant_id):
 ########################################
 # PRODUCTS
 ########################################
-@app.route('/product/<int:product_id>/')
-def showProduct(product_id):
-    product = session.query(Product).filter_by(id=product_id).one()
-    return render_template('product/details.html', product=product)
+
 
 
 
