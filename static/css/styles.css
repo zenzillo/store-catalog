@@ -145,7 +145,8 @@ a:hover, a:focus {
 }
 
 /* Main product page */
-.detail-box {
-	border: 1px solid #ccc;
-	margin-left:-20px;
+.photo-box img {
+	border: 5px solid #fff;
+	outline: 1px solid #ccc;
+	float: right;
 }
