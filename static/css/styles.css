@@ -144,11 +144,8 @@ a:hover, a:focus {
 	padding: 0 1.25rem !important;
 }
 
-/* invoices */
-.form-group ul {
-	list-style-type: none;
-}
-
-li label {
-	font-weight: normal;
+/* Main product page */
+.detail-box {
+	border: 1px solid #ccc;
+	margin-left:-20px;
 }
