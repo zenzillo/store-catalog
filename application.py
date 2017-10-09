@@ -249,7 +249,15 @@ def showProduct(category_name, product_name):
     category = session.query(Category).filter_by(name=category_name).first()
     #categories = session.query(Category).order_by(asc(Category.name))
     product = session.query(Product).filter_by(name=product_name).first()
-    return render_template('product/detail.html', product=product, category=category)
+    print(product.user_id)
+    print(login_session['user_id'])
+    # Determine if logged in user is product owner
+    if product.user_id == login_session['user_id']:
+        user_can_edit = 1
+    else:
+        user_can_edit = 0
+
+    return render_template('product/detail.html', product=product, category=category, user_can_edit = user_can_edit)
 
 
 # Edit a restaurant
