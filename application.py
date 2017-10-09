@@ -243,11 +243,25 @@ def newCategory():
         return render_template('category/new.html')
 
 
+# Create a new product
+@app.route('/catalog/product/new', methods=['GET', 'POST'])
+def newProduct():
+    if 'username' not in login_session:
+        return redirect('/login')
+    if request.method == 'POST':
+        newProduct = Product(name=request.form['name'], user_id=login_session['user_id'])
+        session.add(newProduct)
+        flash('New Product %s Successfully Created' % newProduct.name)
+        session.commit()
+        return redirect(url_for('showCatalog'))
+    else:
+        return render_template('product/new.html')
+
+
 # Display product
 @app.route('/catalog/<category_name>/<product_name>', methods=['GET', 'POST'])
 def showProduct(category_name, product_name):
     category = session.query(Category).filter_by(name=category_name).first()
-    #categories = session.query(Category).order_by(asc(Category.name))
     product = session.query(Product).filter_by(name=product_name).first()
     print(product.user_id)
     print(login_session['user_id'])

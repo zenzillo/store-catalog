@@ -4,13 +4,18 @@
 {% block content %}
 
 
-	<div class="d-flex justify-content-start">
-		<div class="p-2">
+	<div class="d-flex justify-content-end">
+		<div class="mr-auto p-2">
 			<h1>Catalog</h1>
 		</div>
-		<div class="ml-auto p-2">
+		<div class="p-2">
 			{%if 'username' in session %}
 			<a class="btn btn-primary" href='{{url_for('newCategory') }}'>New category</a>
+			{% endif %}
+		</div>
+		<div class="p-2">
+			{%if 'username' in session %}
+			<a class="btn btn-primary" href='{{url_for('newProduct') }}'>New product</a>
 			{% endif %}
 		</div>
 	</div>
