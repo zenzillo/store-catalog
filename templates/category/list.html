@@ -24,11 +24,15 @@
 			<span class="small-heading">Categories</span>
 			<ul class="nav flex-column">
 			  <li class="nav-item">
-			    <a class="nav-link active" href="{{url_for('showCatalog')}}">All</a>
+			    <a class="nav-link active" href="{{url_for('showCatalog')}}">Latest Items</a>
 			  </li>
+			  <li class="nav-item">
+			    <a class="nav-link" href="{{url_for('showCategory', category_name = 'All')}}">All</a>
+			  </li>
+			  <hr>
 			{% for category in categories %}
 			  <li class="nav-item">
-			    <a class="nav-link active" href="{{url_for('showCategory', category_name = category.name)}}">{{category.name}}</a>
+			    <a class="nav-link" href="{{url_for('showCategory', category_name = category.name)}}">{{category.name}}</a>
 			  </li>
 			{% endfor %}
 			</ul>
