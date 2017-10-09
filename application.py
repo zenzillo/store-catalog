@@ -206,22 +206,26 @@ def restaurantsJSON():
 # Show all categories
 @app.route('/')
 def showCatalog():
-    categories = session.query(Category).order_by(asc(Category.name))
-    products = session.query(Product).order_by(Product.category_id, Product.name).all()
-    return render_template('category/list.html', categories=categories, products=products)
+    categories = session.query(Category).order_by(Category.name)
+    products = session.query(Product).order_by(Product.id.desc()).all()
+    return render_template('category/list.html', categories=categories, products=products, current_category='Latest Items')
 
 @app.route('/catalog/<category_name>/items', methods=['GET', 'POST'])
 def showCategory(category_name):
+    # Display all categories and products
     if (category_name == 'All'):
+        current_category = 'All'
         category_id = 0
         categories = session.query(Category).order_by(asc(Category.name))
         products = session.query(Product).order_by(Product.category_id, Product.name).all()
+    # Display specific category and their products
     else:
+        current_category = category_name
         category = session.query(Category).filter_by(name=category_name).first()
         category_id = category.id
         categories = session.query(Category).order_by(asc(Category.name))
         products = session.query(Product).filter_by(category_id=category.id).order_by(asc(Product.name))
-    return render_template('category/list.html', category_id=category_id, categories=categories, products=products)
+    return render_template('category/list.html', category_id=category_id, categories=categories, products=products, current_category=current_category)
 
 
 # Create a new category
