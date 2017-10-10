@@ -44,6 +44,7 @@ class Product(Base):
     category = relationship(Category)
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship(User)
+    photos = relationship("ProductPhoto", primaryjoin="and_(Product.id==ProductPhoto.product_id )")
 
     @property
     def serialize(self):

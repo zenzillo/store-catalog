@@ -59,7 +59,11 @@
 				<!-- Display product information -->
 				<div class="product-thumb">
 					<a href="{{url_for('showProduct', category_name = product.category.name, product_name = product.name)}}">
+						{% if product.photos %}
+						<img src="{{url_for('viewUploadFile', filename = product.photos[0].filename)}}"><br>
+						{% else %}
 						<img src="http://via.placeholder.com/200x200"><br>
+						{% endif %}
 						{{product.name}}<br>
 						{{product.sku}}
 					</a>
