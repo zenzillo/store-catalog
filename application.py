@@ -1,18 +1,19 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, Markup
+import os
+import json
+import random
+import string
+import requests
+import httplib2
+from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, Markup, make_response
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Product, ProductPhoto, User
 from flask import session as login_session
-import random
-import string
-
-# IMPORTS FOR THIS STEP
+from werkzeug.utils import secure_filename
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
-import httplib2
-import json
-from flask import make_response
-import requests
+
+
 
 app = Flask(__name__)
 
@@ -20,6 +21,11 @@ app = Flask(__name__)
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Store Catalog Application"
+
+# Constants
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+# Setup image directories
+UPLOAD_FOLDER = './static/uploads'
 
 
 # Connect to Database and create database session
@@ -29,6 +35,11 @@ Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+# Determing if uploaded photo is correct file type
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 # Create anti-forgery state token
@@ -264,6 +275,21 @@ def newProduct():
         else:
             sku = getNextSku(category_id)
 
+        # check if photo was uploaded
+        print(request.form)
+        if 'photo' not in request.files:
+            flash('No file found')
+            return redirect(request.url)
+        file = request.files['photo']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+
         # create new product
         newProduct = Product(name=request.form['name'],
                              sku=sku,
@@ -273,6 +299,14 @@ def newProduct():
                              description=request.form['description'],
                              user_id=login_session['user_id'])
         session.add(newProduct)
+
+        # save photo in database
+        if filename:
+            newPhoto = ProductPhoto(filename=filename,
+                                    order_placement=1,
+                                    product=newProduct)
+            session.add(newPhoto)
+
         flash(Markup('New product <b>{0}</b> successfully created'.format(newProduct.name)))
         session.commit()
         return redirect(url_for('showCatalog'))
