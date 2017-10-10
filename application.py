@@ -341,7 +341,7 @@ def getNextSku(category_id):
 @app.route('/catalog/<category_name>/<product_name>', methods=['GET', 'POST'])
 def showProduct(category_name, product_name):
     category = session.query(Category).filter_by(name=category_name).first()
-    product = session.query(Product).filter_by(name=product_name).first()
+    product = session.query(Product).filter_by(name=product_name, category_id=category.id).first()
     productPhoto = session.query(ProductPhoto).filter_by(product_id=product.id).first()
     print(product.user_id)
     print(login_session['user_id'])
@@ -352,6 +352,26 @@ def showProduct(category_name, product_name):
         user_can_edit = 0
 
     return render_template('product/detail.html', product=product, category=category, user_can_edit = user_can_edit, productPhoto=productPhoto)
+
+# Delete product
+@app.route('/catalog/<category_name>/<product_name>/delete', methods=['GET', 'POST'])
+def deleteProduct(category_name, product_name):
+    category = session.query(Category).filter_by(name=category_name).first()
+    product = session.query(Product).filter_by(name=product_name, category_id=category.id).first()
+
+    # Determine if logged in user is product owner
+    if product.user_id == login_session['user_id']:
+        if request.method == 'POST':
+            # delete product
+            session.delete(product)
+            flash('%s successfully deleted' % product.name)
+            session.commit()
+            return redirect(url_for('showCategory', category_name=category.name))
+        return render_template('product/delete.html', category=category, product=product)
+    else:
+        flash("You do not have permission to delete this product.", "danger")
+        return redirect(url_for('showCatalog'))
+
 
 
 # Edit a restaurant

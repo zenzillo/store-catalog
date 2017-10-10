@@ -1,0 +1,42 @@
+{% set active_page = 'catalog' %}
+{% extends 'base.html' %}
+
+{% block content %}
+
+	<nav class="breadcrumb">
+	  <a class="breadcrumb-item" href="{{url_for('showCatalog') }}">Catalog</a>
+	  <a class="breadcrumb-item" href="{{url_for('showCategory', category_name = category.name) }}">{{category.name}}</a>
+	  <span class="breadcrumb-item active">{{product.name}}</span>
+	</nav>
+
+	{% if msg %}
+	<div class="row">
+		<div class="col-md-12">
+				<p>{{ msg }}</p>
+				<a href='{{url_for('showCatalog')}}'>Back to Catalog</a>
+		</div>
+	</div>
+	{% else %}
+
+	<div class="row">
+		<div class="col-md-12">
+			<h1>Are you sure you want to delete {{product.name}}?</h1>
+		</div>
+	</div>
+
+	<div class="row">
+
+		<form action="#" method = 'post'>
+			<div class="form-group">
+				<div class="col-sm-10">
+					<input type="submit" class="btn btn-primary" value="Delete">&nbsp;&nbsp;<a href='{{url_for('showProduct', category_name=category.name, product_name=product.name)}}'>Cancel</a>
+				</div>
+			</div>
+
+		</form>
+
+	</div>
+	{% endif %}
+</div>
+
+{% endblock %}
