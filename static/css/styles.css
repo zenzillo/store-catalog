@@ -154,4 +154,5 @@ a:hover, a:focus {
 	border: 5px solid #fff;
 	outline: 1px solid #ccc;
 	float: right;
+	width: 350px;
 }

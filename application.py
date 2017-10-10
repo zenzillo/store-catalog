@@ -4,7 +4,7 @@ import random
 import string
 import requests
 import httplib2
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, Markup, make_response
+from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, Markup, make_response, send_from_directory
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Product, ProductPhoto, User
@@ -38,6 +38,14 @@ UPLOAD_FOLDER = './static/uploads'
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+#
+# View images
+#
+@app.route('/uploads/<filename>')
+def viewUploadFile(filename):
+    print(UPLOAD_FOLDER)
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 
 # Create anti-forgery state token
@@ -334,6 +342,7 @@ def getNextSku(category_id):
 def showProduct(category_name, product_name):
     category = session.query(Category).filter_by(name=category_name).first()
     product = session.query(Product).filter_by(name=product_name).first()
+    productPhoto = session.query(ProductPhoto).filter_by(product_id=product.id).first()
     print(product.user_id)
     print(login_session['user_id'])
     # Determine if logged in user is product owner
@@ -342,7 +351,7 @@ def showProduct(category_name, product_name):
     else:
         user_can_edit = 0
 
-    return render_template('product/detail.html', product=product, category=category, user_can_edit = user_can_edit)
+    return render_template('product/detail.html', product=product, category=category, user_can_edit = user_can_edit, productPhoto=productPhoto)
 
 
 # Edit a restaurant

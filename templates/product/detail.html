@@ -15,14 +15,25 @@
 			<h1>{{product.name}}</h1>
 			<b>SKU:</b> {{product.sku}}<br>
 			<b>Price:</b> ${{product.price}}<br>
+			<b>Status:</b>
+				{% if product.status == 1 %}
+				<span class="alert-success">Active</span>
+				{% else %}
+				<span class="alert-danger">Inactive</span>
+				{% endif %}
+			<br>
 			<b>Description:</b><br>
 			<p>{{product.description}}</p>
 			{% if user_can_edit == 1 %}
-				Edit | Delete
+				<a href="">Edit</a> | <a href="">Delete</a>
 			{% endif %}
 		</div>
 		<div class="col-md-5 photo-box">
+			{% if productPhoto %}
+			<img src="{{url_for('viewUploadFile', filename = productPhoto.filename)}}">
+			{% else %}
 			<img src="http://via.placeholder.com/350x350">
+			{% endif %}
 		</div>
 	</div>
 
