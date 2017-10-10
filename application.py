@@ -22,12 +22,6 @@ CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Store Catalog Application"
 
-# Constants
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-# Setup image directories
-UPLOAD_FOLDER = './static/uploads'
-
-
 # Connect to Database and create database session
 #engine = create_engine('sqlite:///restaurantmenu.db')
 engine = create_engine('postgresql+psycopg2:///mystore')
@@ -35,6 +29,10 @@ Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+# Photo upload constants
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+UPLOAD_FOLDER = './static/uploads'
 
 # Determing if uploaded photo is correct file type
 def allowed_file(filename):
