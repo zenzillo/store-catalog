@@ -106,13 +106,18 @@ a:hover, a:focus {
 	outline:1px solid #ccc;
 	margin-bottom:10px;
 }
-
-
 .photo-display {
 	height: 200px;
 	padding: 0 0 20px 10px;
 }
-
+/* product form */
+.checkbox-padding {
+	padding-left: 20px;
+}
+.status-label {
+	padding-top: 5px;
+	margin-bottom: 10px;
+}
 .required:after {
    content:" *";
    color:red;

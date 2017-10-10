@@ -246,6 +246,7 @@ def newCategory():
 # Create a new product
 @app.route('/catalog/product/new', methods=['GET', 'POST'])
 def newProduct():
+    categories = session.query(Category).order_by(Category.name).all()
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
@@ -255,7 +256,7 @@ def newProduct():
         session.commit()
         return redirect(url_for('showCatalog'))
     else:
-        return render_template('product/new.html')
+        return render_template('product/new.html', categories=categories)
 
 
 # Display product
