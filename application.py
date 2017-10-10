@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, Markup
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Product, ProductPhoto, User
@@ -250,14 +250,52 @@ def newProduct():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
-        newProduct = Product(name=request.form['name'], user_id=login_session['user_id'])
+        category_id = request.form['category_id']
+
+        # convert status to an integer to be stored in database
+        if request.form['status']=='on':
+            status = 1
+        else:
+            status = 0
+
+        # check to see if sku was left blank, auto-populate if empty
+        if request.form['sku']:
+            sku = request.form['sku']
+        else:
+            sku = getNextSku(category_id)
+
+        # create new product
+        newProduct = Product(name=request.form['name'],
+                             sku=sku,
+                             price=request.form['price'],
+                             status=status,
+                             category_id=category_id,
+                             description=request.form['description'],
+                             user_id=login_session['user_id'])
         session.add(newProduct)
-        flash('New Product %s Successfully Created' % newProduct.name)
+        flash(Markup('New product <b>{0}</b> successfully created'.format(newProduct.name)))
         session.commit()
         return redirect(url_for('showCatalog'))
     else:
         return render_template('product/new.html', categories=categories)
 
+def getNextSku(category_id):
+    ''' Return the next available sku number for the given category'''
+    # get sku code from category
+    category = session.query(Category).filter_by(id=category_id).first()
+    print(category)
+    print(category.id)
+    print(category.sku_code)
+    # find the highest sku code for products in that category
+    product_last_sku = session.query(Product).filter_by(category_id=category_id).order_by(Product.sku.desc()).first()
+    # parse product sku number
+    last_sku_code, last_sku_number = product_last_sku.sku.split("-")
+    print(last_sku_number)
+    # increment sku number
+    product_next_sku = int(last_sku_number) + 1
+    # concatenate sku code and sku number
+    sku = str(category.sku_code) + "-" + str(product_next_sku)
+    return sku
 
 # Display product
 @app.route('/catalog/<category_name>/<product_name>', methods=['GET', 'POST'])
