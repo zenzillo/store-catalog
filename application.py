@@ -372,22 +372,26 @@ def newProduct():
         session.commit()
         return redirect(url_for('showCatalog'))
     else:
-        return render_template('product/new.html', categories=categories)
+        return render_template('product/new.html', product=None, categories=categories)
 
 def getNextSku(category_id):
     ''' Return the next available sku number for the given category'''
     # get sku code from category
     category = session.query(Category).filter_by(id=category_id).first()
-    print(category)
-    print(category.id)
-    print(category.sku_code)
     # find the highest sku code for products in that category
     product_last_sku = session.query(Product).filter_by(category_id=category_id).order_by(Product.sku.desc()).first()
-    # parse product sku number
-    last_sku_code, last_sku_number = product_last_sku.sku.split("-")
-    print(last_sku_number)
-    # increment sku number
-    product_next_sku = int(last_sku_number) + 1
+    if product_last_sku:
+        # parse product sku number
+        try:
+            last_sku_code, last_sku_number = product_last_sku.sku.split("-")
+            print(last_sku_number)
+        except:
+            last_sku_number = product_last_sku.sku
+        # increment sku number
+        product_next_sku = int(last_sku_number) + 1
+    else:
+        # default sku to 0001
+        product_next_sku = '0001'
     # concatenate sku code and sku number
     sku = str(category.sku_code) + "-" + str(product_next_sku)
     return sku

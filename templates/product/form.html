@@ -8,7 +8,9 @@
 			<div class="form-group col-md-4">
 				<label for="sku">SKU</label>
 				<input type ="text" class="form-control" maxlength="10" name="sku" value="{{product.sku}}">
+				{% if page_type == 'new' %}
 				<small id="skuHelp" class="form-text text-muted">Leave SKU empty to auto-populate.</small>
+				{% endif %}
 			</div>
 			<div class="form-group col-md-4">
 				<label for="price">Price</label>
