@@ -86,6 +86,10 @@ a:hover, a:focus {
 	margin-bottom:50px;
 }
 
+.sm-left-padding {
+	padding-left:10px;
+}
+
 /* main content area */
 .left-border {
 	border-left: 1px solid #ccc;

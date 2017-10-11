@@ -1,44 +1,59 @@
-{% extends "main.html" %}
+{% set active_page = 'catalog' %}
+{% extends 'base.html' %}
+
 {% block content %}
-{% include "header.html" %}
-	<div class="row top-menu">
-		<div class="col-md-10"></div>
-		<div class="col-md-2 text-right">
-					</div>
-	</div>
-	<div class="row divider blue">
-		<div class="col-md-12"></div>
-	</div>
-	<div class="row banner main">
-		<div class="col-md-1"></div>
-		<div class="col-md-11 padding-none">
-			<h1>Category: {{category.name}}</h1>
+
+
+	<nav class="breadcrumb">
+	  <a class="breadcrumb-item" href="{{url_for('showCatalog') }}">Catalog</a>
+	  <span class="breadcrumb-item active">{{category.name}}</span>
+	</nav>
+
+
+
+	<div class="d-flex justify-content-end top-margin">
+		<div class="mr-auto">
+			<h1>{{category.name}}</h1>
+			SKU Code: {{category.sku_code}}<br>
+			Total Items: {{products|length}}
+		</div>
+		<div>
+			{%if 'username' in session %}
+			<a class="btn btn-primary" href='{{url_for('newCategory') }}'>Edit category</a>
+			{% endif %}
+		</div>
+		<div class="sm-left-padding">
+			{%if 'username' in session %}
+			<a class="btn btn-primary" href='{{url_for('newCategory') }}'>Delete category</a>
+			{% endif %}
 		</div>
 	</div>
 
-<div class = 'flash'>
-		      {% with messages = get_flashed_messages() %}
-      {% if messages %}
 
-        <ul>
-        {% for message in messages %}
-            <li> <strong> {{ message }} </strong> </li>
-        {% endfor %}
-        </ul>
-        {% endif %}
-    {% endwith %}
+ 	<div class="row top-margin">
+		<div class="col-md-12">
 
-</div>
+		{% for product in products %}
 
-	{% for product in products %}
-		<a href = "{{url_for('showProduct', product_id = product.id)}}">
-			<div class="row">
-				<div class="col-md-1"></div>
-					<div class="col-md-10 category-list">
-						<h3>{{product.name}}</h3>
-					</div>
-				<div class="col-md-1"></div>
+			<!-- Display product information -->
+			<div class="product-thumb">
+				<a href="{{url_for('showProduct', category_name = product.category.name, product_name = product.name)}}">
+					{% if product.photos %}
+					<img src="{{url_for('viewUploadFile', filename = product.photos[0].filename)}}"><br>
+					{% else %}
+					<img src="http://via.placeholder.com/200x200"><br>
+					{% endif %}
+					{{product.name}}<br>
+					{{product.sku}}
+				</a>
 			</div>
-		</a>
-	{% endfor %}
+		{% else %}
+		<p class="top-margin">There are no products for this category.
+			{%if 'username' in session %}
+		<a href="{{url_for('newProduct')}}">Create a new product.</a>
+			{% endif %}
+		</p>
+		{% endfor %}
+	</div>
+
 {% endblock %}
