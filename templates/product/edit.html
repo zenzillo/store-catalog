@@ -17,9 +17,19 @@
 
 		{% include 'product/form.html' %}
 
-		<div class="top-margin">
+		<div class="row">
+			<div class="col-md-5 photo-box">
+				{% if product.photos %}
+				<img src="{{url_for('viewUploadFile', filename = product.photos[0].filename)}}">
+				{% else %}
+				<img src="http://via.placeholder.com/350x350">
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="top-margin bottom-margin">
 			<button type="submit" class="btn btn-primary" id="submit" type="submit">
-		Save</button>&nbsp;&nbsp;<a href='{{url_for('showCatalog')}}'>Cancel</a>
+		Save</button>&nbsp;&nbsp;<a href="{{url_for('showProduct', category_name=category.name, product_name=product.name)}}">Cancel</a>
 		</div>
 	</form>
 

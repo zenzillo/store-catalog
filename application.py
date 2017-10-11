@@ -422,18 +422,24 @@ def editProduct(product_name):
                         photo_uploaded = True
 
             # update product
-            product = Product(name=request.form['name'],
-                             sku=request.form['sku'],
-                             price=request.form['price'],
-                             status=status,
-                             category_id=request.form['category_id'],
-                             description=request.form['description'],
-                             user_id=login_session['user_id'])
+            product.name = request.form['name']
+            product.sku = request.form['sku']
+            product.price = request.form['price']
+            product.status = status
+            product.category_id=request.form['category_id']
+            product.description=request.form['description']
+
             session.add(product)
             print(product)
 
             # save photo in database
             if photo_uploaded:
+                # delete any previously saved photos
+                photos = session.query(ProductPhoto).filter_by(product_id=product.id).all()
+                for photo in photos:
+                    session.delete(photo)
+                    session.commit()
+                # save new photo
                 newPhoto = ProductPhoto(filename=filename,
                                     order_placement=1,
                                     product=product)

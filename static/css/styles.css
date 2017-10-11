@@ -82,6 +82,10 @@ a:hover, a:focus {
 	margin-top:50px;
 }
 
+.bottom-margin {
+	margin-bottom:50px;
+}
+
 /* main content area */
 .left-border {
 	border-left: 1px solid #ccc;
@@ -153,6 +157,5 @@ a:hover, a:focus {
 .photo-box img {
 	border: 5px solid #fff;
 	outline: 1px solid #ccc;
-	float: right;
 	width: 350px;
 }

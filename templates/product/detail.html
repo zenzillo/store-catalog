@@ -30,9 +30,9 @@
 		</div>
 		<div class="col-md-5 photo-box">
 			{% if product.photos %}
-			<img src="{{url_for('viewUploadFile', filename = product.photos[0].filename)}}">
+			<img class="float-right" src="{{url_for('viewUploadFile', filename = product.photos[0].filename)}}">
 			{% else %}
-			<img src="http://via.placeholder.com/350x350">
+			<img class="float-right" src="http://via.placeholder.com/350x350">
 			{% endif %}
 		</div>
 	</div>
