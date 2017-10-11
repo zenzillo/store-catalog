@@ -24,7 +24,7 @@
 		</div>
 		<div class="sm-left-padding">
 			{%if user_can_edit == 1 %}
-			<a class="btn btn-primary" href='{{url_for('newCategory') }}'>Delete category</a>
+			<a class="btn btn-primary" href='{{url_for('deleteCategory', category_name=category.name) }}'>Delete category</a>
 			{% endif %}
 		</div>
 	</div>

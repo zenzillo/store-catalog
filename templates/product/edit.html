@@ -3,9 +3,14 @@
 
 {% block content %}
 
-<div class="container">
+	<nav class="breadcrumb">
+	  <a class="breadcrumb-item" href="{{url_for('showCatalog') }}">Catalog</a>
+	  <a class="breadcrumb-item" href="{{url_for('showCategory', category_name=category.name) }}">{{category.name}}</a>
+	  <a class="breadcrumb-item" href="{{url_for('showProduct', category_name=category.name, product_name=product.name) }}">{{product.name}}</a>
+	  <span class="breadcrumb-item active">Edit</span>
+	</nav>
 
-	<div class="row">
+	<div class="row top-margin">
 		<div class="col-md-8">
 			<h1>Edit Product</h1>
 		</div>
@@ -33,5 +38,5 @@
 		</div>
 	</form>
 
-</div>
+
 {% endblock %}

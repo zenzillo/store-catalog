@@ -5,8 +5,7 @@
 
 	<nav class="breadcrumb">
 	  <a class="breadcrumb-item" href="{{url_for('showCatalog') }}">Catalog</a>
-	  <a class="breadcrumb-item" href="{{url_for('showCategory', category_name=category.name) }}">{{category.name}}</a>
-	  <a class="breadcrumb-item" href="{{url_for('showProduct', category_name=category.name, product_name=product.name) }}">{{product.name}}</a>
+	  <a class="breadcrumb-item" href="{{url_for('showCategory', category_name = category.name) }}">{{category.name}}</a>
 	  <span class="breadcrumb-item active">Delete</span>
 	</nav>
 
@@ -21,7 +20,7 @@
 
 	<div class="row top-margin">
 		<div class="col-md-12">
-			<h1>Are you sure you want to delete {{product.name}}?</h1>
+			<h1>Are you sure you want to delete {{category.name}}?</h1>
 		</div>
 	</div>
 
@@ -29,7 +28,7 @@
 		<div class="col-12 top-margin">
 			<form action="#" method = "post">
 				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-				<input type="submit" class="btn btn-primary" value="Delete">&nbsp;&nbsp;<a href="{{url_for('showProduct', category_name=category.name, product_name=product.name)}}">Cancel</a>
+				<input type="submit" class="btn btn-primary" value="Delete">&nbsp;&nbsp;<a href="{{url_for('showCategory', category_name=category.name)}}">Cancel</a>
 			</form>
 		</div>
 	</div>

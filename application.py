@@ -260,6 +260,7 @@ def restaurantsJSON():
 
 # Show all categories
 @app.route('/')
+@app.route('/catalog')
 def showCatalog(current_category='Latest Items'):
     categories = session.query(Category).order_by(Category.name)
     products = session.query(Product).order_by(Product.id.desc()).all()
@@ -305,7 +306,7 @@ def newCategory():
     return render_template('category/new.html', category=None)
 
 # Edit category
-@app.route('/catalog/<category_name>/edit', methods=['GET', 'POST'])
+@app.route('/category/<category_name>/edit', methods=['GET', 'POST'])
 def editCategory(category_name):
     category = session.query(Category).filter_by(name=category_name).first()
     if 'username' not in login_session:
@@ -334,7 +335,29 @@ def editCategory(category_name):
         return redirect(url_for('showCategory', category_name=category.name))
     return render_template('category/edit.html', category=category)
 
+# Delete category
+@app.route('/category/<category_name>/delete', methods=['GET', 'POST'])
+def deleteCategory(category_name):
+    category = session.query(Category).filter_by(name=category_name).first()
+    products = session.query(Product).filter_by(category_id=category.id).all()
+    # Determine if logged in user is category owner
+    if category.user_id == login_session['user_id']:
+        if request.method == 'POST':
+            # delete category
+            session.delete(category)
+            if products:
+                # delete all associated products
+                for products in product:
+                    session.delete(product)
+                    session.commit()
 
+            flash(Markup('<b>{0}</b> successfully deleted'.format(category.name) ))
+            session.commit()
+            return redirect(url_for('showCatalog'))
+        return render_template('category/delete.html', category=category)
+    else:
+        flash("You do not have permission to delete this category.", "danger")
+        return redirect(url_for('showCatalog'))
 
 ########################################
 # PRODUCTS
