@@ -337,19 +337,14 @@ def newProduct():
             sku = getNextSku(category_id)
 
         # check if photo was uploaded
-        print(request.form)
-        if 'photo' not in request.files:
-            flash('No file found')
-            return redirect(request.url)
-        file = request.files['photo']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        photo_uploaded = False
+        if 'photo' in request.files:
+            file = request.files['photo']
+            if file.filename != '':
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    photo_uploaded = True
 
         # create new product
         newProduct = Product(name=request.form['name'],
@@ -362,7 +357,7 @@ def newProduct():
         session.add(newProduct)
 
         # save photo in database
-        if filename:
+        if photo_uploaded:
             newPhoto = ProductPhoto(filename=filename,
                                     order_placement=1,
                                     product=newProduct)
