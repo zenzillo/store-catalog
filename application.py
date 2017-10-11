@@ -324,12 +324,6 @@ def newProduct():
     if request.method == 'POST':
         category_id = request.form['category_id']
 
-        # convert status to an integer to be stored in database
-        if request.form['status']=='on':
-            status = 1
-        else:
-            status = 0
-
         # check to see if sku was left blank, auto-populate if empty
         if request.form['sku']:
             sku = request.form['sku']
@@ -350,7 +344,7 @@ def newProduct():
         newProduct = Product(name=request.form['name'],
                              sku=sku,
                              price=request.form['price'],
-                             status=status,
+                             status=request.form['status'],
                              category_id=category_id,
                              description=request.form['description'],
                              user_id=login_session['user_id'])
@@ -404,12 +398,6 @@ def editProduct(product_name):
         # get form data
         if request.method == 'POST':
 
-            # convert status to an integer to be stored in database
-            if request.form['status']=='on':
-                status = 1
-            else:
-                status = 0
-
             # check if photo was uploaded
             photo_uploaded = False
             if 'photo' in request.files:
@@ -424,7 +412,7 @@ def editProduct(product_name):
             product.name = request.form['name']
             product.sku = request.form['sku']
             product.price = request.form['price']
-            product.status = status
+            product.status = request.form['status']
             product.category_id=request.form['category_id']
             product.description=request.form['description']
 
