@@ -25,7 +25,7 @@
 			<b>Description:</b><br>
 			<p>{{product.description}}</p>
 			{% if user_can_edit == 1 %}
-				<a href="">Edit</a> | <a href="{{url_for('deleteProduct', product_name=product.name)}}">Delete</a>
+				<a href="{{url_for('editProduct', product_name=product.name)}}">Edit</a> | <a href="{{url_for('deleteProduct', product_name=product.name)}}">Delete</a>
 			{% endif %}
 		</div>
 		<div class="col-md-5 photo-box">

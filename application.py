@@ -396,20 +396,57 @@ def getNextSku(category_id):
 # Edit product
 @app.route('/catalog/<product_name>/edit', methods=['GET', 'POST'])
 def editProduct(product_name):
-    category = session.query(Category).filter_by(name=category_name).first()
-    product = session.query(Product).filter_by(name=product_name, category_id=category.id).first()
+    product = session.query(Product).filter_by(name=product_name).first()
+    category = session.query(Category).filter_by(name=product.category.name).first()
+    categories = session.query(Category).order_by(Category.name).all()
 
     # Determine if logged in user is product owner
     if product.user_id == login_session['user_id']:
+        # get form data
         if request.method == 'POST':
-            # delete product
-            session.delete(product)
-            flash('%s successfully deleted' % product.name)
+
+            # convert status to an integer to be stored in database
+            if request.form['status']=='on':
+                status = 1
+            else:
+                status = 0
+
+            # check if photo was uploaded
+            photo_uploaded = False
+            if 'photo' in request.files:
+                file = request.files['photo']
+                if file.filename != '':
+                    if file and allowed_file(file.filename):
+                        filename = secure_filename(file.filename)
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                        photo_uploaded = True
+
+            # update product
+            product = Product(name=request.form['name'],
+                             sku=request.form['sku'],
+                             price=request.form['price'],
+                             status=status,
+                             category_id=request.form['category_id'],
+                             description=request.form['description'],
+                             user_id=login_session['user_id'])
+            session.add(product)
+            print(product)
+
+            # save photo in database
+            if photo_uploaded:
+                newPhoto = ProductPhoto(filename=filename,
+                                    order_placement=1,
+                                    product=product)
+                session.add(newPhoto)
+
+
+            flash('%s successfully edited' % product.name)
             session.commit()
-            return redirect(url_for('showCategory', category_name=category.name))
-        return render_template('product/delete.html', category=category, product=product)
+
+            return redirect(url_for('showProduct', category_name=category.name, product_name=product.name))
+        return render_template('product/edit.html', category=category, product=product, categories=categories)
     else:
-        flash("You do not have permission to delete this product.", "danger")
+        flash("You do not have permission to edit this product.", "danger")
         return redirect(url_for('showCatalog'))
 
 # Delete product

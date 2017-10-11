@@ -1,0 +1,46 @@
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+		<input type="hidden" name="product_id" value="{{ product.id }}"/>
+		<div class="form-group">
+			<label for="name">Name</label>
+			<input type ="text" class="form-control" maxlength="100" name="name" value="{{product.name}}">
+		</div>
+		<div class="row">
+			<div class="form-group col-md-4">
+				<label for="sku">SKU</label>
+				<input type ="text" class="form-control" maxlength="10" name="sku" value="{{product.sku}}">
+				<small id="skuHelp" class="form-text text-muted">Leave SKU empty to auto-populate.</small>
+			</div>
+			<div class="form-group col-md-4">
+				<label for="price">Price</label>
+				$ <input type ="text" class="form-control" maxlength="10" name="price" value="{{product.price}}">
+				<small id="priceHelp" class="form-text text-muted">Enter a decimal number without a dollar sign.</small>
+			</div>
+			<div class="form-group col-md-4">
+				<p class="status-label">Status</p>
+				<label for="status" class="checkbox-padding">
+					<input type="checkbox" class="form-check-input" name="status" {% if product.status==1 %} checked {% endif %}>
+					Active
+    			</label>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="category_id">Category</label>
+		    <select class="form-control" name="category_id">
+		    {% for category in categories %}
+		    	{% if product.category_id==category.id %}
+				<option value="{{category.id}}" selected>{{category.name}}</option>
+		    	{% else %}
+		      	<option value="{{category.id}}">{{category.name}}</option>
+		      	{% endif %}
+		    {% endfor %}
+		    </select>
+		</div>
+		<div class="form-group">
+			<label for="description">Description</label>
+			<textarea class="form-control" name="description" rows="5">{{product.description}}</textarea>
+		</div>
+		<div class="form-group">
+			<label for="photo">Photo upload</label>
+			<input type="file" class="form-control-file" id="photoUpload" name="photo" aria-describedby="fileHelp">
+			<small id="fileHelp" class="form-text text-muted">Upload images at least 350px x 350px for best results. File formats accepted: .jpg, .png, .gif</small>
+		</div>
