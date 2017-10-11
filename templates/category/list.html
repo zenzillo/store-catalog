@@ -32,27 +32,24 @@
 			    <a class="nav-link {% if current_category=='Latest Items' %} active {% endif %}" href="{{url_for('showCatalog')}}">Latest Items</a>
 			  </li>
 			  <li class="nav-item">
-			    <a class="nav-link {% if current_category=='All' %} active {% endif %}" href="{{url_for('showCategory', category_name = 'All')}}">All</a>
+			    <a class="nav-link {% if current_category=='All' %} active {% endif %}" href="{{url_for('showCatalogAll')}}">All</a>
 			  </li>
 			  <hr>
 			{% for category in categories %}
 			  <li class="nav-item">
-			    <a class="nav-link {% if current_category==category.name %} active {% endif %}" href="{{url_for('showCategory', category_name = category.name)}}">{{category.name}}</a>
+			    <a class="nav-link" href="{{url_for('showCategory', category_name = category.name)}}">{{category.name}}</a>
 			  </li>
 			{% endfor %}
 			</ul>
 		</div>
 		<div class="col-md-10 left-border">
-			<span class="small-heading no-padding">Products</span><br>
 			<!-- Only show large header on 'Latest Items' and 'All' pages -->
-			{% if current_category=='Latest Items' or current_category=='All' %}
 			<h2 class="category-heading">{{current_category}}</h2>
-			{% endif %}
 			{% set category_header = {'id': 0} %}
 			{% for product in products %}
 				<!-- Display small category header -->
 				{% if category_header['id'] != product.category_id %}
-			<h3 class="category-heading">{{product.category.name}}</h3>
+			<h3 class="sm-category-heading">{{product.category.name}}</h3>
 				{% if category_header.update({'id': product.category_id}) %}
 				{% endif %}
 				{% endif %}

@@ -258,18 +258,23 @@ def restaurantsJSON():
 # CATEGORIES
 ########################################
 
-# Show all categories
 @app.route('/')
 @app.route('/catalog')
-def showCatalog(current_category='Latest Items'):
+def showCatalog():
+    ''' Display latest items in catalog '''
+    current_category='Latest Items'
     categories = session.query(Category).order_by(Category.name)
     products = session.query(Product).order_by(Product.id.desc()).all()
-    # Display all categories and products
-    if (current_category == 'All'):
-        category_id = 0
-        categories = session.query(Category).order_by(asc(Category.name))
-        products = session.query(Product).order_by(Product.category_id, Product.name).all()
     return render_template('category/list.html', categories=categories, products=products, current_category=current_category)
+
+@app.route('/catalog/all')
+def showCatalogAll():
+    ''' Display all categories and all of their products'''
+    current_category='All'
+    categories = session.query(Category).order_by(asc(Category.name))
+    products = session.query(Product).order_by(Product.category_id, Product.name).all()
+    return render_template('category/list.html', categories=categories, products=products, current_category=current_category)
+
 
 # Display specific category and their products
 @app.route('/catalog/<category_name>/items', methods=['GET', 'POST'])

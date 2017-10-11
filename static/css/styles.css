@@ -101,6 +101,10 @@ a:hover, a:focus {
 }
 
 .category-heading {
+	clear: both;
+}
+
+.sm-category-heading {
 	padding-top:20px;
 	clear: both;
 }
