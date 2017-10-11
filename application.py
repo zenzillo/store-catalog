@@ -289,13 +289,18 @@ def newCategory():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
-        newCategory = Category(name=request.form['name'], user_id=login_session['user_id'])
-        session.add(newCategory)
-        flash('New Category %s Successfully Created' % newCategory.name)
-        session.commit()
-        return redirect(url_for('showCatalog'))
-    else:
-        return render_template('category/new.html')
+        if isUniqueSkuCode(request.form['sku_code']):
+            newCategory = Category(name=request.form['name'],
+                               sku_code=request.form['sku_code'],
+                               user_id=login_session['user_id'])
+            session.add(newCategory)
+            flash(Markup('New category <b>{0}</b> successfully created'.format(newCategory.name)))
+            session.commit()
+            return redirect(url_for('showCatalog'))
+        else:
+            flash('SKU code must be unique', 'danger')
+    return render_template('category/new.html')
+
 
 ########################################
 # PRODUCTS
@@ -326,7 +331,11 @@ def newProduct():
 
         # check to see if sku was left blank, auto-populate if empty
         if request.form['sku']:
-            sku = request.form['sku']
+            if isUniqueSku(request.form['sku']):
+                sku = request.form['sku']
+            else:
+                flash('SKU code must be unique', 'danger')
+                return render_template('product/new.html', product=None, categories=categories)
         else:
             sku = getNextSku(category_id)
 
@@ -363,28 +372,6 @@ def newProduct():
     else:
         return render_template('product/new.html', product=None, categories=categories)
 
-def getNextSku(category_id):
-    ''' Return the next available sku number for the given category'''
-    # get sku code from category
-    category = session.query(Category).filter_by(id=category_id).first()
-    # find the highest sku code for products in that category
-    product_last_sku = session.query(Product).filter_by(category_id=category_id).order_by(Product.sku.desc()).first()
-    if product_last_sku:
-        # parse product sku number
-        try:
-            last_sku_code, last_sku_number = product_last_sku.sku.split("-")
-            print(last_sku_number)
-        except:
-            last_sku_number = product_last_sku.sku
-        # increment sku number
-        product_next_sku = int(last_sku_number) + 1
-    else:
-        # default sku to 0001
-        product_next_sku = '0001'
-    # concatenate sku code and sku number
-    sku = str(category.sku_code) + "-" + str(product_next_sku)
-    return sku
-
 
 # Edit product
 @app.route('/catalog/<product_name>/edit', methods=['GET', 'POST'])
@@ -408,9 +395,18 @@ def editProduct(product_name):
                         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                         photo_uploaded = True
 
+
+            # check to see if sku was changed
+            if request.form['sku'] != product.sku:
+                if isUniqueSku(request.form['sku']):
+                    product.sku = request.form['sku']
+                else:
+                    flash('SKU code must be unique', 'danger')
+                    return render_template('product/edit.html', category=category, product=product, categories=categories)
+
+
             # update product
             product.name = request.form['name']
-            product.sku = request.form['sku']
             product.price = request.form['price']
             product.status = request.form['status']
             product.category_id=request.form['category_id']
@@ -462,6 +458,45 @@ def deleteProduct(product_name):
         return redirect(url_for('showCatalog'))
 
 
+########################################
+# SKU FUNCTIONS
+########################################
+
+def getNextSku(category_id):
+    ''' Return the next available sku number for the given category'''
+    # get sku code from category
+    category = session.query(Category).filter_by(id=category_id).first()
+    # find the highest sku code for products in that category
+    product_last_sku = session.query(Product).filter_by(category_id=category_id).order_by(Product.sku.desc()).first()
+    if product_last_sku:
+        # parse product sku number
+        try:
+            last_sku_code, last_sku_number = product_last_sku.sku.split("-")
+            print(last_sku_number)
+        except:
+            last_sku_number = product_last_sku.sku
+        # increment sku number
+        product_next_sku = int(last_sku_number) + 1
+    else:
+        # default sku to 0001
+        product_next_sku = '1'
+    # concatenate sku code and sku number
+    sku = str(category.sku_code) + "-" + str(product_next_sku)
+    return sku
+
+def isUniqueSkuCode(sku_code):
+    '''Determine if category SKU code is unique'''
+    sku_exists = session.query(Category).filter_by(sku_code=sku_code).first()
+    if sku_exists:
+        return False
+    return True
+
+def isUniqueSku(sku):
+    '''Determine if product SKU is unique'''
+    sku_exists = session.query(Product).filter_by(sku=sku).first()
+    if sku_exists:
+        return False
+    return True
 
 
 if __name__ == '__main__':

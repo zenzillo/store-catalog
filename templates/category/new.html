@@ -20,12 +20,13 @@
 			<input type ="text" class="form-control" maxlength="100" name="name">
 		</div>
 		<div class="form-group">
-		<label for="name">SKU Code:</label>
-		<input type ="text" class="form-control" maxlength="10" name="sku_code">
+			<label for="name">SKU Code:</label>
+			<input type ="text" class="form-control" maxlength="10" name="sku_code">
+			<small id="skuHelp" class="form-text text-muted">This SKU code will be prepended to the SKUs of all products in this cateogry. For example, the category 'Shirt' has SKU code 'SH'</small>
 		</div>
 		<div class="padding-bottom"></div>
-		<button type="submit" class="btn btn-primary" id="submit" type="submit">
-		Create</button>&nbsp;&nbsp;<a href='{{url_for('showCatalog')}}'>Cancel</a>
+			<button type="submit" class="btn btn-primary" id="submit" type="submit">
+			Create</button>&nbsp;&nbsp;<a href='{{url_for('showCatalog')}}'>Cancel</a>
 		</div>
 	</form>
 

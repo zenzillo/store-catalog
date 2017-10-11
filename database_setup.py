@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, UniqueConstraint
 
 Base = declarative_base()
 
@@ -18,7 +18,7 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
-    sku_code = Column(String(10))
+    sku_code = Column(String(10), unique=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship(User)
 
@@ -33,12 +33,11 @@ class Category(Base):
 class Product(Base):
     __tablename__ = 'products'
 
-
     id = Column(Integer, primary_key = True)
     name = Column(String(80), nullable = False)
     description = Column(String(250))
     price = Column(String(8))
-    sku = Column(String(50))
+    sku = Column(String(50), unique=True)
     status = Column(Integer)
     category_id = Column(Integer,ForeignKey('categories.id'))
     category = relationship(Category)
@@ -60,7 +59,6 @@ class Product(Base):
 
 class ProductPhoto(Base):
     __tablename__ = 'product_photos'
-
 
     id = Column(Integer, primary_key = True)
     filename = Column(String(80), nullable = False)
