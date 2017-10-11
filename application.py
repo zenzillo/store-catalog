@@ -39,19 +39,25 @@ app.secret_key = 'agkfiertOykvafibofAbajDicEufOfNotVa'
 csrf = CSRFProtect(app)
 
 
+########################################
+# IMAGE FUNCTIONS
+########################################
+
 # Determing if uploaded photo is correct file type
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-#
 # View images
-#
 @app.route('/uploads/<filename>')
 def viewUploadFile(filename):
     print(app.config['UPLOAD_FOLDER'])
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+
+########################################
+# LOGIN / LOGOUT
+########################################
 
 # Create anti-forgery state token
 @app.route('/login')
@@ -204,6 +210,29 @@ def gdisconnect():
         return response
 
 
+# Disconnect based on provider
+@app.route('/disconnect')
+def disconnect():
+    if 'provider' in login_session:
+        if login_session['provider'] == 'google':
+            gdisconnect()
+            del login_session['gplus_id']
+            #del login_session['credentials']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        del login_session['user_id']
+        del login_session['provider']
+        flash("You have successfully been logged out.")
+        return redirect(url_for('showCatalog'))
+    else:
+        flash("You were not logged in")
+        return redirect(url_for('showCatalog'))
+
+########################################
+# JSON API
+########################################
+
 # JSON APIs to view Restaurant Information
 @app.route('/restaurant/<int:restaurant_id>/menu/JSON')
 def restaurantMenuJSON(restaurant_id):
@@ -224,6 +253,10 @@ def restaurantsJSON():
     restaurants = session.query(Restaurant).all()
     return jsonify(restaurants=[r.serialize for r in restaurants])
 
+
+########################################
+# CATEGORIES
+########################################
 
 # Show all categories
 @app.route('/')
@@ -264,6 +297,23 @@ def newCategory():
     else:
         return render_template('category/new.html')
 
+########################################
+# PRODUCTS
+########################################
+
+# Display product
+@app.route('/catalog/<category_name>/<product_name>', methods=['GET', 'POST'])
+def showProduct(category_name, product_name):
+    category = session.query(Category).filter_by(name=category_name).first()
+    product = session.query(Product).filter_by(name=product_name, category_id=category.id).first()
+    productPhoto = session.query(ProductPhoto).filter_by(product_id=product.id).first()
+    # Determine if logged in user is product owner
+    if product.user_id == login_session['user_id']:
+        user_can_edit = 1
+    else:
+        user_can_edit = 0
+
+    return render_template('product/detail.html', product=product, category=category, user_can_edit = user_can_edit, productPhoto=productPhoto)
 
 # Create a new product
 @app.route('/catalog/product/new', methods=['GET', 'POST'])
@@ -342,19 +392,6 @@ def getNextSku(category_id):
     sku = str(category.sku_code) + "-" + str(product_next_sku)
     return sku
 
-# Display product
-@app.route('/catalog/<category_name>/<product_name>', methods=['GET', 'POST'])
-def showProduct(category_name, product_name):
-    category = session.query(Category).filter_by(name=category_name).first()
-    product = session.query(Product).filter_by(name=product_name, category_id=category.id).first()
-    productPhoto = session.query(ProductPhoto).filter_by(product_id=product.id).first()
-    # Determine if logged in user is product owner
-    if product.user_id == login_session['user_id']:
-        user_can_edit = 1
-    else:
-        user_can_edit = 0
-
-    return render_template('product/detail.html', product=product, category=category, user_can_edit = user_can_edit, productPhoto=productPhoto)
 
 # Delete product
 @app.route('/catalog/<category_name>/<product_name>/delete', methods=['GET', 'POST'])
@@ -376,148 +413,6 @@ def deleteProduct(category_name, product_name):
         return redirect(url_for('showCatalog'))
 
 
-
-# Edit a restaurant
-@app.route('/restaurant/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
-def editRestaurant(restaurant_id):
-    editedRestaurant = session.query(
-        Restaurant).filter_by(id=restaurant_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if editedRestaurant.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to edit this restaurant. Please create your own restaurant in order to edit.');}</script><body onload='myFunction()''>"
-    if request.method == 'POST':
-        if request.form['name']:
-            editedRestaurant.name = request.form['name']
-            flash('Restaurant Successfully Edited %s' % editedRestaurant.name)
-            return redirect(url_for('showRestaurants'))
-    else:
-        return render_template('editRestaurant.html', restaurant=editedRestaurant)
-
-
-# Delete a restaurant
-@app.route('/restaurant/<int:restaurant_id>/delete/', methods=['GET', 'POST'])
-def deleteRestaurant(restaurant_id):
-    restaurantToDelete = session.query(
-        Restaurant).filter_by(id=restaurant_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if restaurantToDelete.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to delete this restaurant. Please create your own restaurant in order to delete.');}</script><body onload='myFunction()''>"
-    if request.method == 'POST':
-        session.delete(restaurantToDelete)
-        flash('%s Successfully Deleted' % restaurantToDelete.name)
-        session.commit()
-        return redirect(url_for('showRestaurants', restaurant_id=restaurant_id))
-    else:
-        return render_template('deleteRestaurant.html', restaurant=restaurantToDelete)
-
-
-########################################
-# PRODUCTS
-########################################
-
-
-
-
-# Show a restaurant menu
-@app.route('/restaurant/<int:restaurant_id>/')
-@app.route('/restaurant/<int:restaurant_id>/menu/')
-def showMenu(restaurant_id):
-    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    items = session.query(MenuItem).filter_by(
-        restaurant_id=restaurant_id).all()
-    creator = getUserInfo(restaurant.user_id)
-    if 'username' not in login_session or creator.id != login_session['user_id']:
-        return render_template('publicmenu.html', items=items, restaurant=restaurant, creator=creator)
-    return render_template('menu.html', items=items, restaurant=restaurant, creator=creator)
-
-
-# Create a new menu item
-@app.route('/restaurant/<int:restaurant_id>/menu/new/', methods=['GET', 'POST'])
-def newMenuItem(restaurant_id):
-    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if login_session['user_id'] != restaurant.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to add menu items to this restaurant. Please create your own restaurant in order to add items.');}</script><body onload='myFunction()''>"
-    if request.method == 'POST':
-        newItem = MenuItem(name=request.form['name'],
-                           description=request.form['description'],
-                           price=request.form['price'],
-                           course=request.form['course'],
-                           restaurant_id=restaurant_id,
-                           user_id=restaurant.user_id)
-        session.add(newItem)
-        session.commit()
-        flash('New Menu %s Item Successfully Created' % (newItem.name))
-        return redirect(url_for('showMenu', restaurant_id=restaurant_id))
-    else:
-        return render_template('newmenuitem.html', restaurant_id=restaurant_id)
-
-# Edit a menu item
-
-
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/edit', methods=['GET', 'POST'])
-def editMenuItem(restaurant_id, menu_id):
-    editedItem = session.query(MenuItem).filter_by(id=menu_id).one()
-    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if login_session['user_id'] != restaurant.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to edit menu items to this restaurant. Please create your own restaurant in order to edit items.');}</script><body onload='myFunction()''>"
-    if request.method == 'POST':
-        if request.form['name']:
-            editedItem.name = request.form['name']
-        if request.form['description']:
-            editedItem.description = request.form['description']
-        if request.form['price']:
-            editedItem.price = request.form['price']
-        if request.form['course']:
-            editedItem.course = request.form['course']
-        session.add(editedItem)
-        session.commit()
-        flash('Menu Item Successfully Edited')
-        return redirect(url_for('showMenu', restaurant_id=restaurant_id))
-    else:
-        return render_template('editmenuitem.html', restaurant_id=restaurant_id, menu_id=menu_id, item=editedItem)
-
-
-# Delete a menu item
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/delete', methods=['GET', 'POST'])
-def deleteMenuItem(restaurant_id, menu_id):
-    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    itemToDelete = session.query(MenuItem).filter_by(id=menu_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if login_session['user_id'] != restaurant.user_id:
-        return "<script>function myFunction() {alert('You are not authorized to delete menu items to this restaurant. Please create your own restaurant in order to delete items.');}</script><body onload='myFunction()''>"
-    if request.method == 'POST':
-        session.delete(itemToDelete)
-        session.commit()
-        flash('Menu Item Successfully Deleted')
-        return redirect(url_for('showMenu', restaurant_id=restaurant_id))
-    else:
-        return render_template('deleteMenuItem.html', item=itemToDelete)
-
-# Disconnect based on provider
-@app.route('/disconnect')
-def disconnect():
-    if 'provider' in login_session:
-        if login_session['provider'] == 'google':
-            gdisconnect()
-            del login_session['gplus_id']
-            #del login_session['credentials']
-        del login_session['username']
-        del login_session['email']
-        del login_session['picture']
-        del login_session['user_id']
-        del login_session['provider']
-        flash("You have successfully been logged out.")
-        return redirect(url_for('showCatalog'))
-    else:
-        flash("You were not logged in")
-        return redirect(url_for('showCatalog'))
 
 
 if __name__ == '__main__':
