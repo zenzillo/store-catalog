@@ -302,7 +302,38 @@ def newCategory():
             return redirect(url_for('showCatalog'))
         else:
             flash('SKU code must be unique', 'danger')
-    return render_template('category/new.html')
+    return render_template('category/new.html', category=None)
+
+# Edit category
+@app.route('/catalog/<category_name>/edit', methods=['GET', 'POST'])
+def editCategory(category_name):
+    category = session.query(Category).filter_by(name=category_name).first()
+    if 'username' not in login_session:
+        return redirect('/login')
+    # Determine if logged in user is product owner
+    if category.user_id == login_session['user_id']:
+
+        if request.method == 'POST':
+            # if new sku code entered
+            if category.sku_code != request.form['sku_code']:
+                # Make sure SKU Code entered is unique
+                if isUniqueSkuCode(request.form['sku_code']):
+                    sku_code = request.form['sku_code']
+                else:
+                    flash('SKU code must be unique', 'danger')
+                    return render_template('category/edit.html', category=category)
+            category = Category(name=request.form['name'],
+                               sku_code=request.form['sku_code'],
+                               user_id=login_session['user_id'])
+            session.add(category)
+            flash(Markup('New category <b>{0}</b> successfully created'.format(category.name)))
+            session.commit()
+            return redirect(url_for('showCatalog'))
+    else:
+        flash("You do not have permission to edit this category.", "danger")
+        return redirect(url_for('showCategory', category_name=category.name))
+    return render_template('category/edit.html', category=category)
+
 
 
 ########################################

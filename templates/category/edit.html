@@ -7,19 +7,19 @@
 
 	<div class="row">
 		<div class="col-md-8">
-			<h1>New Category</h1>
+			<h1>Edit Category</h1>
 		</div>
 	</div>
 
 	<br/>
 
-	<form action="#" method = "post">
+	<form action="#" method = "post" enctype="multipart/form-data">
 
 		{% include 'category/form.html' %}
 
-		<div class="top-margin padding-bottom"></div>
+		<div class="top-margin bottom-margin">
 			<button type="submit" class="btn btn-primary" id="submit" type="submit">
-			Create</button>&nbsp;&nbsp;<a href='{{url_for('showCatalog')}}'>Cancel</a>
+		Save</button>&nbsp;&nbsp;<a href="{{url_for('showCategory', category_name=category.name)}}">Cancel</a>
 		</div>
 	</form>
 
