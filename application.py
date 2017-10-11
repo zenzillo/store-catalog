@@ -270,14 +270,20 @@ def showCatalog(current_category='Latest Items'):
         products = session.query(Product).order_by(Product.category_id, Product.name).all()
     return render_template('category/list.html', categories=categories, products=products, current_category=current_category)
 
+# Display specific category and their products
 @app.route('/catalog/<category_name>/items', methods=['GET', 'POST'])
 def showCategory(category_name):
-    # Display specific category and their products
     current_category = category_name
     category = session.query(Category).filter_by(name=category_name).first()
     categories = session.query(Category).order_by(asc(Category.name)).all()
     products = session.query(Product).filter_by(category_id=category.id).order_by(asc(Product.name)).all()
-    return render_template('category/details.html', category=category, categories=categories, products=products, current_category=current_category)
+    # Determine if logged in user is category owner
+    if category.user_id == login_session['user_id']:
+        user_can_edit = 1
+    else:
+        user_can_edit = 0
+
+    return render_template('category/details.html', category=category, categories=categories, products=products, current_category=current_category, user_can_edit = user_can_edit)
 
 
 # Create a new category
