@@ -32,7 +32,7 @@ session = DBSession()
 
 # Photo upload constants
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-UPLOAD_FOLDER = './static/uploads'
+app.config['UPLOAD_FOLDER'] = './static/uploads'
 
 # Determing if uploaded photo is correct file type
 def allowed_file(filename):
@@ -44,8 +44,8 @@ def allowed_file(filename):
 #
 @app.route('/uploads/<filename>')
 def viewUploadFile(filename):
-    print(UPLOAD_FOLDER)
-    return send_from_directory(UPLOAD_FOLDER, filename)
+    print(app.config['UPLOAD_FOLDER'])
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 # Create anti-forgery state token
@@ -294,7 +294,7 @@ def newProduct():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         # create new product
         newProduct = Product(name=request.form['name'],
