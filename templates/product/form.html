@@ -35,7 +35,7 @@
 			<label for="category_id">Category</label>
 		    <select class="form-control" name="category_id">
 		    {% for category in categories %}
-		    	{% if product.category_id==category.id %}
+		    	{% if product.category_id==category.id or preselected_category.id==category.id %}
 				<option value="{{category.id}}" selected>{{category.name}}</option>
 		    	{% else %}
 		      	<option value="{{category.id}}">{{category.name}}</option>

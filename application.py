@@ -277,14 +277,15 @@ def showCategory(category_name):
     current_category = category_name
     category = session.query(Category).filter_by(name=category_name).first()
     categories = session.query(Category).order_by(asc(Category.name)).all()
-    products = session.query(Product).filter_by(category_id=category.id).order_by(asc(Product.name)).all()
+    products = session.query(Product).filter_by(category_id=category.id,status=1).order_by(asc(Product.name)).all()
+    inactive_products = session.query(Product).filter_by(category_id=category.id,status=0).order_by(asc(Product.name)).all()
     # Determine if logged in user is category owner
     if category.user_id == login_session['user_id']:
         user_can_edit = 1
     else:
         user_can_edit = 0
 
-    return render_template('category/details.html', category=category, categories=categories, products=products, current_category=current_category, user_can_edit = user_can_edit)
+    return render_template('category/details.html', category=category, categories=categories, products=products, current_category=current_category, user_can_edit = user_can_edit, inactive_products=inactive_products)
 
 
 # Create a new category
@@ -378,9 +379,10 @@ def showProduct(category_name, product_name):
     return render_template('product/detail.html', product=product, category=category, user_can_edit = user_can_edit, productPhoto=productPhoto)
 
 # Create a new product
-@app.route('/catalog/product/new', methods=['GET', 'POST'])
-def newProduct():
+@app.route('/catalog/<category_name>/new', methods=['GET', 'POST'])
+def newProduct(category_name):
     categories = session.query(Category).order_by(Category.name).all()
+    preselected_category = session.query(Category).filter_by(name=category_name).first()
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
@@ -427,7 +429,7 @@ def newProduct():
         session.commit()
         return redirect(url_for('showCatalog'))
     else:
-        return render_template('product/new.html', product=None, categories=categories)
+        return render_template('product/new.html', product=None, categories=categories, preselected_category=preselected_category)
 
 
 # Edit product

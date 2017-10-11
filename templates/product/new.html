@@ -3,9 +3,16 @@
 
 {% block content %}
 
-<div class="container">
 
-	<div class="row">
+	<nav class="breadcrumb">
+	  <a class="breadcrumb-item" href="{{url_for('showCatalog') }}">Catalog</a>
+	  {% if preselected_category.name %}
+	  <a class="breadcrumb-item" href="{{url_for('showCategory', category_name=preselected_category.name) }}">{{preselected_category.name}}</a>
+	  {% endif %}
+	  <span class="breadcrumb-item active">New product</span>
+	</nav>
+
+	<div class="row top-margin">
 		<div class="col-md-8">
 			<h1>New Product</h1>
 		</div>
@@ -24,5 +31,4 @@
 		</div>
 	</form>
 
-</div>
 {% endblock %}

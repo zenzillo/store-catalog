@@ -15,7 +15,7 @@
 		</div>
 		<div class="p-2">
 			{%if 'username' in session %}
-			<a class="btn btn-primary" href='{{url_for('newProduct') }}'>New product</a>
+			<a class="btn btn-primary" href='{{url_for('newProduct', category_name='product') }}'>New product</a>
 			{% endif %}
 		</div>
 	</div>
