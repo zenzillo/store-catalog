@@ -393,11 +393,30 @@ def getNextSku(category_id):
     return sku
 
 
-# Delete product
-@app.route('/catalog/<category_name>/<product_name>/delete', methods=['GET', 'POST'])
-def deleteProduct(category_name, product_name):
+# Edit product
+@app.route('/catalog/<product_name>/edit', methods=['GET', 'POST'])
+def editProduct(product_name):
     category = session.query(Category).filter_by(name=category_name).first()
     product = session.query(Product).filter_by(name=product_name, category_id=category.id).first()
+
+    # Determine if logged in user is product owner
+    if product.user_id == login_session['user_id']:
+        if request.method == 'POST':
+            # delete product
+            session.delete(product)
+            flash('%s successfully deleted' % product.name)
+            session.commit()
+            return redirect(url_for('showCategory', category_name=category.name))
+        return render_template('product/delete.html', category=category, product=product)
+    else:
+        flash("You do not have permission to delete this product.", "danger")
+        return redirect(url_for('showCatalog'))
+
+# Delete product
+@app.route('/catalog/<product_name>/delete', methods=['GET', 'POST'])
+def deleteProduct(product_name):
+    product = session.query(Product).filter_by(name=product_name).first()
+    category = session.query(Category).filter_by(name=product.category.name).first()
 
     # Determine if logged in user is product owner
     if product.user_id == login_session['user_id']:
