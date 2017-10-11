@@ -48,7 +48,7 @@
 				</a>
 			</div>
 		{% else %}
-		<p class="top-margin">There are no products for this category.
+		<p>There are no products for this category.
 			{%if 'username' in session %}
 		<a href="{{url_for('newProduct')}}">Create a new product.</a>
 			{% endif %}
