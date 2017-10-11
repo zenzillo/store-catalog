@@ -9,6 +9,7 @@ from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Product, ProductPhoto, User
 from flask import session as login_session
+from flask_wtf.csrf import CSRFProtect
 from werkzeug.utils import secure_filename
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
@@ -23,7 +24,6 @@ CLIENT_ID = json.loads(
 APPLICATION_NAME = "Store Catalog Application"
 
 # Connect to Database and create database session
-#engine = create_engine('sqlite:///restaurantmenu.db')
 engine = create_engine('postgresql+psycopg2:///mystore')
 Base.metadata.bind = engine
 
@@ -33,6 +33,11 @@ session = DBSession()
 # Photo upload constants
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = './static/uploads'
+
+# Add CSRF Protection
+app.secret_key = 'agkfiertOykvafibofAbajDicEufOfNotVa'
+csrf = CSRFProtect(app)
+
 
 # Determing if uploaded photo is correct file type
 def allowed_file(filename):
@@ -343,8 +348,6 @@ def showProduct(category_name, product_name):
     category = session.query(Category).filter_by(name=category_name).first()
     product = session.query(Product).filter_by(name=product_name, category_id=category.id).first()
     productPhoto = session.query(ProductPhoto).filter_by(product_id=product.id).first()
-    print(product.user_id)
-    print(login_session['user_id'])
     # Determine if logged in user is product owner
     if product.user_id == login_session['user_id']:
         user_can_edit = 1
