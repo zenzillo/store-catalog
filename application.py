@@ -285,7 +285,7 @@ def showCategory(category_name):
     products = session.query(Product).filter_by(category_id=category.id,status=1).order_by(asc(Product.name)).all()
     inactive_products = session.query(Product).filter_by(category_id=category.id,status=0).order_by(asc(Product.name)).all()
     # Determine if logged in user is category owner
-    if category.user_id == login_session['user_id']:
+    if 'username' in login_session and category.user_id == login_session['user_id']:
         user_can_edit = 1
     else:
         user_can_edit = 0
@@ -296,6 +296,7 @@ def showCategory(category_name):
 # Create a new category
 @app.route('/catalog/new/', methods=['GET', 'POST'])
 def newCategory():
+    # determine if user logged in
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
@@ -315,6 +316,7 @@ def newCategory():
 @app.route('/category/<category_name>/edit', methods=['GET', 'POST'])
 def editCategory(category_name):
     category = session.query(Category).filter_by(name=category_name).first()
+    # Determine if user logged in
     if 'username' not in login_session:
         return redirect('/login')
     # Determine if logged in user is product owner
@@ -346,7 +348,10 @@ def editCategory(category_name):
 def deleteCategory(category_name):
     category = session.query(Category).filter_by(name=category_name).first()
     products = session.query(Product).filter_by(category_id=category.id).all()
-    # Determine if logged in user is category owner
+    # Determine if logged in
+    if 'username' not in login_session:
+        return redirect('/login')
+    # determine if uesr is category owner
     if category.user_id == login_session['user_id']:
         if request.method == 'POST':
             if products:
@@ -378,7 +383,7 @@ def showProduct(category_name, product_name):
     product = session.query(Product).filter_by(name=product_name, category_id=category.id).first()
     productPhoto = session.query(ProductPhoto).filter_by(product_id=product.id).first()
     # Determine if logged in user is product owner
-    if product.user_id == login_session['user_id']:
+    if 'username' in login_session and product.user_id == login_session['user_id']:
         user_can_edit = 1
     else:
         user_can_edit = 0
@@ -390,6 +395,7 @@ def showProduct(category_name, product_name):
 def newProduct(category_name):
     categories = session.query(Category).order_by(Category.name).all()
     preselected_category = session.query(Category).filter_by(name=category_name).first()
+    # determine if user is logged in
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
@@ -446,6 +452,9 @@ def editProduct(product_name):
     category = session.query(Category).filter_by(name=product.category.name).first()
     categories = session.query(Category).order_by(Category.name).all()
     preselected_category=category
+    # Determine if logged in
+    if 'username' not in login_session:
+        return redirect('/login')
     # Determine if logged in user is product owner
     if product.user_id == login_session['user_id']:
         # get form data
@@ -461,7 +470,6 @@ def editProduct(product_name):
                         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                         photo_uploaded = True
 
-
             # check to see if sku was changed
             if request.form['sku'] != product.sku:
                 if isUniqueSku(request.form['sku']):
@@ -469,7 +477,6 @@ def editProduct(product_name):
                 else:
                     flash('SKU code must be unique', 'danger')
                     return render_template('product/edit.html', category=category, product=product, categories=categories)
-
 
             # update product
             product.name = request.form['name']
@@ -479,18 +486,16 @@ def editProduct(product_name):
             product.description=request.form['description']
 
             session.add(product)
-            print(product)
 
             # save photo in database
             if photo_uploaded:
-                # delete any previously saved photos
+                # first delete any previously saved photos
                 deleteProductPhotos(product.id)
                 # save new photo
                 newPhoto = ProductPhoto(filename=filename,
                                     order_placement=1,
                                     product=product)
                 session.add(newPhoto)
-
 
             flash('%s successfully edited' % product.name)
             session.commit()
@@ -506,7 +511,9 @@ def editProduct(product_name):
 def deleteProduct(product_name):
     product = session.query(Product).filter_by(name=product_name).first()
     category = session.query(Category).filter_by(name=product.category.name).first()
-
+    # Determine if logged in
+    if 'username' not in login_session:
+        return redirect('/login')
     # Determine if logged in user is product owner
     if product.user_id == login_session['user_id']:
         if request.method == 'POST':
