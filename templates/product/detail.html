@@ -18,7 +18,7 @@
 		</div>
 		<div>
 			{%if user_can_edit == 1 %}
-			<a class="btn btn-primary" href='{{url_for('editProduct',category_name=category.name, product_name=product.name) }}'>Edit product</a>
+			<a class="btn btn-primary" href='{{url_for('editProduct', product_name=product.name) }}'>Edit product</a>
 			{% endif %}
 		</div>
 		<div class="sm-left-padding">

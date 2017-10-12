@@ -349,14 +349,16 @@ def deleteCategory(category_name):
     # Determine if logged in user is category owner
     if category.user_id == login_session['user_id']:
         if request.method == 'POST':
-            # delete category
-            session.delete(category)
             if products:
                 # delete all associated products
-                for products in product:
+                for product in products:
+                    # delete photos
+                    deleteProductPhotos(product.id)
+                    # delete product
                     session.delete(product)
                     session.commit()
-
+            # delete category
+            session.delete(category)
             flash(Markup('<b>{0}</b> successfully deleted'.format(category.name) ))
             session.commit()
             return redirect(url_for('showCatalog'))
@@ -443,7 +445,7 @@ def editProduct(product_name):
     product = session.query(Product).filter_by(name=product_name).first()
     category = session.query(Category).filter_by(name=product.category.name).first()
     categories = session.query(Category).order_by(Category.name).all()
-
+    preselected_category=category
     # Determine if logged in user is product owner
     if product.user_id == login_session['user_id']:
         # get form data
@@ -482,10 +484,7 @@ def editProduct(product_name):
             # save photo in database
             if photo_uploaded:
                 # delete any previously saved photos
-                photos = session.query(ProductPhoto).filter_by(product_id=product.id).all()
-                for photo in photos:
-                    session.delete(photo)
-                    session.commit()
+                deleteProductPhotos(product.id)
                 # save new photo
                 newPhoto = ProductPhoto(filename=filename,
                                     order_placement=1,
@@ -497,7 +496,7 @@ def editProduct(product_name):
             session.commit()
 
             return redirect(url_for('showProduct', category_name=category.name, product_name=product.name))
-        return render_template('product/edit.html', category=category, product=product, categories=categories)
+        return render_template('product/edit.html', category=category, product=product, categories=categories, preselected_category=preselected_category)
     else:
         flash("You do not have permission to edit this product.", "danger")
         return redirect(url_for('showCatalog'))
@@ -512,6 +511,7 @@ def deleteProduct(product_name):
     if product.user_id == login_session['user_id']:
         if request.method == 'POST':
             # delete product
+            deleteProductPhotos(product.id)
             session.delete(product)
             flash('%s successfully deleted' % product.name)
             session.commit()
@@ -521,6 +521,17 @@ def deleteProduct(product_name):
         flash("You do not have permission to delete this product.", "danger")
         return redirect(url_for('showCatalog'))
 
+
+def deleteProductPhotos(product_id):
+    ''' Find all photos for each product and delete the files '''
+    photos = session.query(ProductPhoto).filter_by(product_id=product_id).all()
+    for photo in photos:
+        # delete file
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], photo.filename))
+        # delete database entry
+        session.delete(photo)
+        session.commit()
+    return True
 
 ########################################
 # SKU FUNCTIONS
