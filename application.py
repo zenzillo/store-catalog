@@ -230,28 +230,41 @@ def disconnect():
         return redirect(url_for('showCatalog'))
 
 ########################################
-# JSON API
+# JSON APIs
 ########################################
 
-# JSON APIs to view Restaurant Information
-@app.route('/restaurant/<int:restaurant_id>/menu/JSON')
-def restaurantMenuJSON(restaurant_id):
-    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    items = session.query(MenuItem).filter_by(
-        restaurant_id=restaurant_id).all()
-    return jsonify(MenuItems=[i.serialize for i in items])
 
+@app.route('/catalog.json')
+def catalogJSON():
+    categories = session.query(Category).all()
+    return jsonify(Category=[i.serialize for i in categories])
 
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/JSON')
-def menuItemJSON(restaurant_id, menu_id):
-    Menu_Item = session.query(MenuItem).filter_by(id=menu_id).one()
-    return jsonify(Menu_Item=Menu_Item.serialize)
+@app.route('/categories.json')
+def categoriesJSON():
+    categories = session.query(Category).all()
+    return jsonify(Category=[i.serialize for i in categories])
 
+@app.route('/products.json')
+def productsJSON():
+    products = session.query(Product).all()
+    return jsonify(Product=[i.serialize for i in products])
 
-@app.route('/restaurant/JSON')
-def restaurantsJSON():
-    restaurants = session.query(Restaurant).all()
-    return jsonify(restaurants=[r.serialize for r in restaurants])
+@app.route('/category/<category_name>/items.json')
+def categoryItemsJSON(category_name):
+    category = session.query(Category).filter_by(name=category_name).one()
+    items = session.query(Product).filter_by(
+        category_id=category.id).all()
+    return jsonify(Product=[i.serialize for i in items])
+
+@app.route('/category/<category_name>/details.json')
+def categoryJSON(category_name):
+    category = session.query(Category).filter_by(name=category_name).one()
+    return jsonify(Category=category.serialize)
+
+@app.route('/item/<product_name>/details.json')
+def productJSON(product_name):
+    product = session.query(Product).filter_by(name=product_name).one()
+    return jsonify(Product=product.serialize)
 
 
 ########################################
@@ -413,6 +426,7 @@ def newProduct(category_name):
 
         # check if photo was uploaded
         photo_uploaded = False
+        # TODO - allow user to upload multiple photo files
         if 'photo' in request.files:
             file = request.files['photo']
             if file.filename != '':

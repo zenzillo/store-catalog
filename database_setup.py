@@ -26,8 +26,9 @@ class Category(Base):
     def serialize(self):
        """Return object data in easily serializeable format"""
        return {
-           'name'         : self.name,
-           'id'           : self.id,
+           'id'         : self.id,
+           'name'       : self.name,
+           'sku_code'   : self.sku_code
        }
 
 class Product(Base):
@@ -49,12 +50,12 @@ class Product(Base):
     def serialize(self):
        """Return object data in easily serializeable format"""
        return {
+           'id'           : self.id,
            'name'         : self.name,
-           'description'         : self.description,
-           'id'         : self.id,
-           'price'         : self.price,
-           'sku'         : self.sku,
-           'status'         : self.status,
+           'sku'          : self.sku,
+           'price'        : self.price,
+           'status'       : self.status,
+           'description'  : self.description,
        }
 
 class ProductPhoto(Base):
