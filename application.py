@@ -4,7 +4,8 @@ import random
 import string
 import requests
 import httplib2
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, Markup, make_response, send_from_directory
+from flask import Flask, render_template, request, redirect, jsonify \
+    url_for, flash, Markup, make_response, send_from_directory
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Product, ProductPhoto, User
@@ -15,10 +16,9 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 
 
-
 app = Flask(__name__)
 
-
+# Google client secrets
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Store Catalog Application"
@@ -49,6 +49,8 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # View images
+
+
 @app.route('/uploads/<filename>')
 def viewUploadFile(filename):
     print(app.config['UPLOAD_FOLDER'])
@@ -122,8 +124,8 @@ def gconnect():
     stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_credentials is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(json.dumps('Current user is already '
+                                            'connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -156,12 +158,16 @@ def gconnect():
     output += '!</b><br>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 150px; text-align:center; height: 150px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 150px; text-align:center; height: '
+    '150px;border-radius: 150px;-webkit-border-radius: '
+    ' 150px;-moz-border-radius: 150px;"> '
     flash("You are now logged in as %s" % login_session['email'])
     print "done!"
     return output
 
 # User Helper Functions
+
+
 def createUser(login_session):
     print('create user: ')
     print(login_session['email'])
@@ -239,15 +245,18 @@ def catalogJSON():
     categories = session.query(Category).all()
     return jsonify(Category=[i.serialize for i in categories])
 
+
 @app.route('/categories.json')
 def categoriesJSON():
     categories = session.query(Category).all()
     return jsonify(Category=[i.serialize for i in categories])
 
+
 @app.route('/products.json')
 def productsJSON():
     products = session.query(Product).all()
     return jsonify(Product=[i.serialize for i in products])
+
 
 @app.route('/category/<category_name>/items.json')
 def categoryItemsJSON(category_name):
@@ -256,10 +265,12 @@ def categoryItemsJSON(category_name):
         category_id=category.id).all()
     return jsonify(Product=[i.serialize for i in items])
 
+
 @app.route('/category/<category_name>/details.json')
 def categoryJSON(category_name):
     category = session.query(Category).filter_by(name=category_name).one()
     return jsonify(Category=category.serialize)
+
 
 @app.route('/item/<product_name>/details.json')
 def productJSON(product_name):
@@ -275,18 +286,26 @@ def productJSON(product_name):
 @app.route('/catalog')
 def showCatalog():
     ''' Display latest items in catalog '''
-    current_category='Latest Items'
+    current_category = 'Latest Items'
     categories = session.query(Category).order_by(Category.name)
     products = session.query(Product).order_by(Product.id.desc()).all()
-    return render_template('category/list.html', categories=categories, products=products, current_category=current_category)
+    return render_template('category/list.html',
+                           categories=categories,
+                           products=products,
+                           current_category=current_category)
+
 
 @app.route('/catalog/all')
 def showCatalogAll():
     ''' Display all categories and all of their products'''
-    current_category='All'
+    current_category = 'All'
     categories = session.query(Category).order_by(asc(Category.name))
-    products = session.query(Product).order_by(Product.category_id, Product.name).all()
-    return render_template('category/list.html', categories=categories, products=products, current_category=current_category)
+    products = session.query(Product).order_by(
+        Product.category_id, Product.name).all()
+    return render_template('category/list.html',
+                           categories=categories,
+                           products=products,
+                           current_category=current_category)
 
 
 # Display specific category and their products
@@ -295,15 +314,24 @@ def showCategory(category_name):
     current_category = category_name
     category = session.query(Category).filter_by(name=category_name).first()
     categories = session.query(Category).order_by(asc(Category.name)).all()
-    products = session.query(Product).filter_by(category_id=category.id,status=1).order_by(asc(Product.name)).all()
-    inactive_products = session.query(Product).filter_by(category_id=category.id,status=0).order_by(asc(Product.name)).all()
+    products = session.query(Product).filter_by(
+        category_id=category.id, status=1).order_by(asc(Product.name)).all()
+    inactive_products = session.query(Product).filter_by(
+        category_id=category.id, status=0).order_by(asc(Product.name)).all()
     # Determine if logged in user is category owner
-    if 'username' in login_session and category.user_id == login_session['user_id']:
+    if 'username' in login_session and
+    category.user_id == login_session['user_id']:
         user_can_edit = 1
     else:
         user_can_edit = 0
 
-    return render_template('category/details.html', category=category, categories=categories, products=products, current_category=current_category, user_can_edit = user_can_edit, inactive_products=inactive_products)
+    return render_template('category/details.html',
+                           category=category,
+                           categories=categories,
+                           products=products,
+                           current_category=current_category,
+                           user_can_edit=user_can_edit,
+                           inactive_products=inactive_products)
 
 
 # Create a new category
@@ -315,10 +343,12 @@ def newCategory():
     if request.method == 'POST':
         if isUniqueSkuCode(request.form['sku_code']):
             newCategory = Category(name=request.form['name'],
-                               sku_code=request.form['sku_code'],
-                               user_id=login_session['user_id'])
+                                   sku_code=request.form['sku_code'],
+                                   user_id=login_session['user_id'])
             session.add(newCategory)
-            flash(Markup('New category <b>{0}</b> successfully created'.format(newCategory.name)))
+            flash(
+                Markup('New category <b>{0}</b> successfully created'
+                       .format(newCategory.name)))
             session.commit()
             return redirect(url_for('showCatalog'))
         else:
@@ -326,6 +356,8 @@ def newCategory():
     return render_template('category/new.html', category=None)
 
 # Edit category
+
+
 @app.route('/category/<category_name>/edit', methods=['GET', 'POST'])
 def editCategory(category_name):
     category = session.query(Category).filter_by(name=category_name).first()
@@ -343,12 +375,14 @@ def editCategory(category_name):
                     sku_code = request.form['sku_code']
                 else:
                     flash('SKU code must be unique', 'danger')
-                    return render_template('category/edit.html', category=category)
+                    return render_template('category/edit.html',
+                                           category=category)
             category = Category(name=request.form['name'],
-                               sku_code=request.form['sku_code'],
-                               user_id=login_session['user_id'])
+                                sku_code=request.form['sku_code'],
+                                user_id=login_session['user_id'])
             session.add(category)
-            flash(Markup('New category <b>{0}</b> successfully created'.format(category.name)))
+            flash(Markup('New category <b>{0}</b> successfully created'
+                         .format(category.name)))
             session.commit()
             return redirect(url_for('showCatalog'))
     else:
@@ -357,6 +391,8 @@ def editCategory(category_name):
     return render_template('category/edit.html', category=category)
 
 # Delete category
+
+
 @app.route('/category/<category_name>/delete', methods=['GET', 'POST'])
 def deleteCategory(category_name):
     category = session.query(Category).filter_by(name=category_name).first()
@@ -377,7 +413,8 @@ def deleteCategory(category_name):
                     session.commit()
             # delete category
             session.delete(category)
-            flash(Markup('<b>{0}</b> successfully deleted'.format(category.name) ))
+            flash(Markup('<b>{0}</b> successfully deleted'
+                         .format(category.name)))
             session.commit()
             return redirect(url_for('showCatalog'))
         return render_template('category/delete.html', category=category)
@@ -390,24 +427,36 @@ def deleteCategory(category_name):
 ########################################
 
 # Display product
+
+
 @app.route('/catalog/<category_name>/<product_name>', methods=['GET', 'POST'])
 def showProduct(category_name, product_name):
     category = session.query(Category).filter_by(name=category_name).first()
-    product = session.query(Product).filter_by(name=product_name, category_id=category.id).first()
-    productPhoto = session.query(ProductPhoto).filter_by(product_id=product.id).first()
+    product = session.query(Product).filter_by(
+        name=product_name, category_id=category.id).first()
+    productPhoto = session.query(ProductPhoto).filter_by(
+        product_id=product.id).first()
     # Determine if logged in user is product owner
-    if 'username' in login_session and product.user_id == login_session['user_id']:
+    if 'username' in login_session and
+    product.user_id == login_session['user_id']:
         user_can_edit = 1
     else:
         user_can_edit = 0
 
-    return render_template('product/detail.html', product=product, category=category, user_can_edit = user_can_edit, productPhoto=productPhoto)
+    return render_template('product/detail.html',
+                           product=product,
+                           category=category,
+                           user_can_edit=user_can_edit,
+                           productPhoto=productPhoto)
 
 # Create a new product
+
+
 @app.route('/catalog/<category_name>/new', methods=['GET', 'POST'])
 def newProduct(category_name):
     categories = session.query(Category).order_by(Category.name).all()
-    preselected_category = session.query(Category).filter_by(name=category_name).first()
+    preselected_category = session.query(
+        Category).filter_by(name=category_name).first()
     # determine if user is logged in
     if 'username' not in login_session:
         return redirect('/login')
@@ -420,7 +469,9 @@ def newProduct(category_name):
                 sku = request.form['sku']
             else:
                 flash('SKU code must be unique', 'danger')
-                return render_template('product/new.html', product=None, categories=categories)
+                return render_template('product/new.html',
+                                       product=None,
+                                       categories=categories)
         else:
             sku = getNextSku(category_id)
 
@@ -432,7 +483,8 @@ def newProduct(category_name):
             if file.filename != '':
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    file.save(os.path.join(
+                        app.config['UPLOAD_FOLDER'], filename))
                     photo_uploaded = True
 
         # create new product
@@ -452,20 +504,25 @@ def newProduct(category_name):
                                     product=newProduct)
             session.add(newPhoto)
 
-        flash(Markup('New product <b>{0}</b> successfully created'.format(newProduct.name)))
+        flash(Markup('New product <b>{0}</b> successfully created'
+                     .format(newProduct.name)))
         session.commit()
         return redirect(url_for('showCatalog'))
     else:
-        return render_template('product/new.html', product=None, categories=categories, preselected_category=preselected_category)
+        return render_template('product/new.html',
+                               product=None,
+                               categories=categories,
+                               preselected_category=preselected_category)
 
 
 # Edit product
 @app.route('/catalog/<product_name>/edit', methods=['GET', 'POST'])
 def editProduct(product_name):
     product = session.query(Product).filter_by(name=product_name).first()
-    category = session.query(Category).filter_by(name=product.category.name).first()
+    category = session.query(Category).filter_by(name=product.category.name)
+    .first()
     categories = session.query(Category).order_by(Category.name).all()
-    preselected_category=category
+    preselected_category = category
     # Determine if logged in
     if 'username' not in login_session:
         return redirect('/login')
@@ -481,7 +538,8 @@ def editProduct(product_name):
                 if file.filename != '':
                     if file and allowed_file(file.filename):
                         filename = secure_filename(file.filename)
-                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                        file.save(os.path.join(
+                            app.config['UPLOAD_FOLDER'], filename))
                         photo_uploaded = True
 
             # check to see if sku was changed
@@ -490,14 +548,17 @@ def editProduct(product_name):
                     product.sku = request.form['sku']
                 else:
                     flash('SKU code must be unique', 'danger')
-                    return render_template('product/edit.html', category=category, product=product, categories=categories)
+                    return render_template('product/edit.html',
+                                           category=category,
+                                           product=product,
+                                           categories=categories)
 
             # update product
             product.name = request.form['name']
             product.price = request.form['price']
             product.status = request.form['status']
-            product.category_id=request.form['category_id']
-            product.description=request.form['description']
+            product.category_id = request.form['category_id']
+            product.description = request.form['description']
 
             session.add(product)
 
@@ -507,24 +568,33 @@ def editProduct(product_name):
                 deleteProductPhotos(product.id)
                 # save new photo
                 newPhoto = ProductPhoto(filename=filename,
-                                    order_placement=1,
-                                    product=product)
+                                        order_placement=1,
+                                        product=product)
                 session.add(newPhoto)
 
             flash('%s successfully edited' % product.name)
             session.commit()
 
-            return redirect(url_for('showProduct', category_name=category.name, product_name=product.name))
-        return render_template('product/edit.html', category=category, product=product, categories=categories, preselected_category=preselected_category)
+            return redirect(url_for('showProduct',
+                                    category_name=category.name,
+                                    product_name=product.name))
+        return render_template('product/edit.html',
+                               category=category,
+                               product=product,
+                               categories=categories,
+                               preselected_category=preselected_category)
     else:
         flash("You do not have permission to edit this product.", "danger")
         return redirect(url_for('showCatalog'))
 
 # Delete product
+
+
 @app.route('/catalog/<product_name>/delete', methods=['GET', 'POST'])
 def deleteProduct(product_name):
     product = session.query(Product).filter_by(name=product_name).first()
-    category = session.query(Category).filter_by(name=product.category.name).first()
+    category = session.query(Category).filter_by(
+        name=product.category.name).first()
     # Determine if logged in
     if 'username' not in login_session:
         return redirect('/login')
@@ -536,8 +606,11 @@ def deleteProduct(product_name):
             session.delete(product)
             flash('%s successfully deleted' % product.name)
             session.commit()
-            return redirect(url_for('showCategory', category_name=category.name))
-        return render_template('product/delete.html', category=category, product=product)
+            return redirect(url_for('showCategory',
+                                    category_name=category.name))
+        return render_template('product/delete.html',
+                               category=category,
+                               product=product)
     else:
         flash("You do not have permission to delete this product.", "danger")
         return redirect(url_for('showCatalog'))
@@ -558,12 +631,14 @@ def deleteProductPhotos(product_id):
 # SKU FUNCTIONS
 ########################################
 
+
 def getNextSku(category_id):
     ''' Return the next available sku number for the given category'''
     # get sku code from category
     category = session.query(Category).filter_by(id=category_id).first()
     # find the highest sku code for products in that category
-    product_last_sku = session.query(Product).filter_by(category_id=category_id).order_by(Product.sku.desc()).first()
+    product_last_sku = session.query(Product).filter_by(
+        category_id=category_id).order_by(Product.sku.desc()).first()
     if product_last_sku:
         # parse product sku number
         try:
@@ -580,12 +655,14 @@ def getNextSku(category_id):
     sku = str(category.sku_code) + "-" + str(product_next_sku)
     return sku
 
+
 def isUniqueSkuCode(sku_code):
     '''Determine if category SKU code is unique'''
     sku_exists = session.query(Category).filter_by(sku_code=sku_code).first()
     if sku_exists:
         return False
     return True
+
 
 def isUniqueSku(sku):
     '''Determine if product SKU is unique'''
