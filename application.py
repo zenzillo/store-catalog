@@ -4,7 +4,7 @@ import random
 import string
 import requests
 import httplib2
-from flask import Flask, render_template, request, redirect, jsonify \
+from flask import Flask, render_template, request, redirect, jsonify, \
     url_for, flash, Markup, make_response, send_from_directory
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
@@ -317,8 +317,8 @@ def showCategory(category_name):
     inactive_products = session.query(Product).filter_by(
         category_id=category.id, status=0).order_by(asc(Product.name)).all()
     # Determine if logged in user is category owner
-    if 'username' in login_session and
-    category.user_id == login_session['user_id']:
+    if 'username' in login_session and \
+        category.user_id == login_session['user_id']:
         user_can_edit = 1
     else:
         user_can_edit = 0
@@ -435,8 +435,8 @@ def showProduct(category_name, product_name):
     productPhoto = session.query(ProductPhoto).filter_by(
         product_id=product.id).first()
     # Determine if logged in user is product owner
-    if 'username' in login_session and
-    product.user_id == login_session['user_id']:
+    if 'username' in login_session and \
+        product.user_id == login_session['user_id']:
         user_can_edit = 1
     else:
         user_can_edit = 0
@@ -517,8 +517,9 @@ def newProduct(category_name):
 @app.route('/catalog/<product_name>/edit', methods=['GET', 'POST'])
 def editProduct(product_name):
     product = session.query(Product).filter_by(name=product_name).first()
-    category = session.query(Category).filter_by(name=product.category.name)
-    .first()
+    category = session.query(Category) \
+                      .filter_by(name=product.category.name) \
+                      .first()
     categories = session.query(Category).order_by(Category.name).all()
     preselected_category = category
     # Determine if logged in
