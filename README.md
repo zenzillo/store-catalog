@@ -39,6 +39,19 @@ Categories have a name and SKU code. This code is prepended to the SKUs of all p
 
 Products have a name, SKU, price, status (active/inactive), category, description, and photo. If no photo is uploaded, a placeholder image is used.
 
+On category pages, active products are displayed at the top of the page and inactive products are displayed below. See category 'Hats'.
+
+
+## JSON Endpoints
+The following JSON endpoints are available:
+
+**http://localhost:8000/catalog.json** - Categories with their respective products
+**http://localhost:8000/categories.json** - All categories
+**http://localhost:8000/category/<category_name>/details.json** - Details about a specific category
+**http://localhost:8000/category/<category_name>/items.json** - All products in a specific category
+**http://localhost:8000/products.json** - All products
+**http://localhost:8000/product/<product_name>/details.json** - Details about a specific product
+
 
 ## TODO
 - Build product form to allow for multiple photo uploads
