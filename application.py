@@ -164,8 +164,6 @@ def gconnect():
     print "done!"
     return output
 
-# User Helper Functions
-
 
 def createUser(login_session):
     ''' Create new user '''
@@ -233,15 +231,15 @@ def disconnect():
         flash("You were not logged in")
         return redirect(url_for('showCatalog'))
 
+
 ########################################
 # JSON APIs
 ########################################
 
-
 @app.route('/catalog.json')
 def catalogJSON():
     categories = session.query(Category).all()
-    return jsonify(Category=[i.serialize for i in categories])
+    return jsonify(Category=[i.serializeWithProducts for i in categories])
 
 
 @app.route('/categories.json')
@@ -418,10 +416,10 @@ def deleteCategory(category_name):
         flash("You do not have permission to delete this category.", "danger")
         return redirect(url_for('showCatalog'))
 
+
 ########################################
 # PRODUCTS
 ########################################
-
 
 @app.route('/catalog/<category_name>/<product_name>', methods=['GET', 'POST'])
 def showProduct(category_name, product_name):

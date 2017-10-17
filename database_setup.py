@@ -21,6 +21,7 @@ class Category(Base):
     sku_code = Column(String(10), unique=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship(User)
+    products = relationship("Product", primaryjoin="and_(Category.id==Product.category_id )")
 
     @property
     def serialize(self):
@@ -29,6 +30,22 @@ class Category(Base):
            'id'         : self.id,
            'name'       : self.name,
            'sku_code'   : self.sku_code
+       }
+
+    @property
+    def serializeWithProducts(self):
+       """Return object data in easily serializeable format"""
+       return {
+           'id'         : self.id,
+           'name'       : self.name,
+           'sku_code'   : self.sku_code,
+           'products'   : [{'id': product.id,
+                            'name': product.name,
+                            'price':product.price,
+                            'sku':product.sku,
+                            'status':product.status,
+                            'description':product.description}
+                            for product in self.products]
        }
 
 class Product(Base):
