@@ -49,8 +49,6 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # View images
-
-
 @app.route('/uploads/<filename>')
 def viewUploadFile(filename):
     print(app.config['UPLOAD_FOLDER'])
@@ -223,7 +221,7 @@ def disconnect():
         if login_session['provider'] == 'google':
             gdisconnect()
             del login_session['gplus_id']
-            #del login_session['credentials']
+            del login_session['credentials']
         del login_session['username']
         del login_session['email']
         del login_session['picture']
