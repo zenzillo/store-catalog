@@ -47,12 +47,12 @@ On category pages, active products are displayed at the top of the page and inac
 ## JSON Endpoints
 The following JSON endpoints are available:
 
-**http://localhost:8000/catalog.json** - Categories with their respective products
-**http://localhost:8000/categories.json** - All categories
-**http://localhost:8000/category/<category_name>/details.json** - Details about a specific category
-**http://localhost:8000/category/<category_name>/items.json** - All products in a specific category
-**http://localhost:8000/products.json** - All products
-**http://localhost:8000/product/<product_name>/details.json** - Details about a specific product
+- **http://localhost:8000/catalog.json** - Categories with their respective products
+- **http://localhost:8000/categories.json** - All categories
+- **http://localhost:8000/category/<category_name>/details.json** - Details about a specific category
+- **http://localhost:8000/category/<category_name>/items.json** - All products in a specific category
+- **http://localhost:8000/products.json** - All products
+- **http://localhost:8000/product/<product_name>/details.json** - Details about a specific product
 
 
 ## TODO
