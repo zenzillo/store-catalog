@@ -28,7 +28,6 @@
 	<div class="row">
 		<div class="col-12 top-margin">
 			<form action="#" method = "post">
-				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 				<input type="submit" class="btn btn-primary" value="Delete">&nbsp;&nbsp;<a href="{{url_for('showCategory', category_name=category.name)}}">Cancel</a>
 			</form>
 		</div>
