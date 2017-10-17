@@ -12,18 +12,16 @@ Now that you have Vagrant up and running type **vagrant ssh** to log into your V
 
 ## Create the PostgreSQL database
 This project requires a Postgresql database. Create a database in vagrant by entering the command to run PostgreSQL...
-
 '''
 psql
 '''
 
 Then create a database called 'mystore':
-
 '''
 CREATE DATABASE mystore;
 '''
 
-Quit the Postgresql with command '\q'.
+Quit the Postgresql with command '\q'
 
 
 ## Running the Catalog Project App
