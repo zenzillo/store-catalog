@@ -265,7 +265,7 @@ def categoryJSON(category_name):
     return jsonify(Category=category.serialize)
 
 
-@app.route('/item/<product_name>/details.json')
+@app.route('/product/<product_name>/details.json')
 def productJSON(product_name):
     product = session.query(Product).filter_by(name=product_name).one()
     return jsonify(Product=product.serialize)
