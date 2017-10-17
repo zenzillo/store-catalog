@@ -34,10 +34,6 @@ session = DBSession()
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = './static/uploads'
 
-# Add CSRF Protection
-app.secret_key = 'agkfiertOykvafibofAbajDicEufOfNotVa'
-csrf = CSRFProtect(app)
-
 
 ########################################
 # IMAGE FUNCTIONS
@@ -70,9 +66,9 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
+# Google connect
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
-    '''Google connect'''
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -157,9 +153,9 @@ def gconnect():
     output += '!</b><br>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 150px; text-align:center; height: '
-    '150px;border-radius: 150px;-webkit-border-radius: '
-    ' 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 150px; text-align:center; ' \
+        'height: 150px;border-radius: 150px; ' \
+        '-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("You are now logged in as %s" % login_session['email'])
     print "done!"
     return output
@@ -167,8 +163,9 @@ def gconnect():
 
 def createUser(login_session):
     ''' Create new user '''
-    newUser = User(name=login_session['username'], email=login_session[
-                   'email'], picture=login_session['picture'])
+    newUser = User(name=login_session['username'],
+                   email=login_session['email'],
+                   picture=login_session['picture'])
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
@@ -565,7 +562,9 @@ def editProduct(product_name):
                                         product=product)
                 session.add(newPhoto)
 
-            flash('%s successfully edited' % product.name)
+            flash(
+                Markup('<b>{0}</b> successfully edited'.format(product.name))
+            )
             session.commit()
 
             return redirect(url_for('showProduct',
