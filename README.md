@@ -1,8 +1,8 @@
 # Catalog Project
-A project where products can be organized by category.
+This is a store catalog application where only logged in users can create products and added them to categories. Login authentication is provided by a Google sign-in button. Visitors to the application can view the catalog but cannot make any changes.
 
 ## Installation
-This project uses a Postgresql database. Create a database in vagrant by entering the command for Postgresql
+This project requires a Postgresql database. Create a database in vagrant by entering the command for Postgresql
 
 '''
 psql
