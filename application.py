@@ -595,7 +595,8 @@ def deleteProduct(product_name):
             # delete product
             deleteProductPhotos(product.id)
             session.delete(product)
-            flash('%s successfully deleted' % product.name)
+            flash(Markup('<b>{0}</b> successfully deleted'
+                         .format(product.name)))
             session.commit()
             return redirect(url_for('showCategory',
                                     category_name=category.name))
