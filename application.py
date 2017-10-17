@@ -43,14 +43,15 @@ csrf = CSRFProtect(app)
 # IMAGE FUNCTIONS
 ########################################
 
-# Determing if uploaded photo is correct file type
 def allowed_file(filename):
+    '''Determine if uploaded photo is correct file type'''
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# View images
+
 @app.route('/uploads/<filename>')
 def viewUploadFile(filename):
+    '''View images'''
     print(app.config['UPLOAD_FOLDER'])
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
@@ -59,9 +60,9 @@ def viewUploadFile(filename):
 # LOGIN / LOGOUT
 ########################################
 
-# Create anti-forgery state token
 @app.route('/login')
 def showLogin():
+    '''Create anti-forgery state token'''
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
@@ -69,9 +70,9 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
-# Google connect
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    '''Google connect'''
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -167,8 +168,7 @@ def gconnect():
 
 
 def createUser(login_session):
-    print('create user: ')
-    print(login_session['email'])
+    ''' Create new user '''
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
     session.add(newUser)
@@ -178,23 +178,23 @@ def createUser(login_session):
 
 
 def getUserInfo(user_id):
+    ''' Get user information '''
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
 
 def getUserID(email):
+    ''' Get user id '''
     try:
         user = session.query(User).filter_by(email=email).one()
-        print('getUserId:')
-        print(user.id)
         return user.id
     except:
         return None
 
 
-# DISCONNECT - Revoke a current user's token and reset their login_session
 @app.route('/gdisconnect')
 def gdisconnect():
+    ''' Revoke a current user's token and reset their login_session'''
     # Only disconnect a connected user.
     credentials = login_session.get('credentials')
     if credentials is None:
@@ -214,9 +214,9 @@ def gdisconnect():
         return response
 
 
-# Disconnect based on provider
 @app.route('/disconnect')
 def disconnect():
+    '''Disconnect based on provider'''
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
             gdisconnect()
@@ -306,9 +306,9 @@ def showCatalogAll():
                            current_category=current_category)
 
 
-# Display specific category and their products
 @app.route('/catalog/<category_name>/items', methods=['GET', 'POST'])
 def showCategory(category_name):
+    '''Display specific category and their products'''
     current_category = category_name
     category = session.query(Category).filter_by(name=category_name).first()
     categories = session.query(Category).order_by(asc(Category.name)).all()
@@ -318,7 +318,7 @@ def showCategory(category_name):
         category_id=category.id, status=0).order_by(asc(Product.name)).all()
     # Determine if logged in user is category owner
     if 'username' in login_session and \
-        category.user_id == login_session['user_id']:
+            category.user_id == login_session['user_id']:
         user_can_edit = 1
     else:
         user_can_edit = 0
@@ -332,9 +332,9 @@ def showCategory(category_name):
                            inactive_products=inactive_products)
 
 
-# Create a new category
 @app.route('/catalog/new/', methods=['GET', 'POST'])
 def newCategory():
+    '''Create a new category'''
     # determine if user logged in
     if 'username' not in login_session:
         return redirect('/login')
@@ -353,11 +353,10 @@ def newCategory():
             flash('SKU code must be unique', 'danger')
     return render_template('category/new.html', category=None)
 
-# Edit category
-
 
 @app.route('/category/<category_name>/edit', methods=['GET', 'POST'])
 def editCategory(category_name):
+    '''Edit category'''
     category = session.query(Category).filter_by(name=category_name).first()
     # Determine if user logged in
     if 'username' not in login_session:
@@ -388,11 +387,10 @@ def editCategory(category_name):
         return redirect(url_for('showCategory', category_name=category.name))
     return render_template('category/edit.html', category=category)
 
-# Delete category
-
 
 @app.route('/category/<category_name>/delete', methods=['GET', 'POST'])
 def deleteCategory(category_name):
+    '''Delete category'''
     category = session.query(Category).filter_by(name=category_name).first()
     products = session.query(Product).filter_by(category_id=category.id).all()
     # Determine if logged in
@@ -424,11 +422,10 @@ def deleteCategory(category_name):
 # PRODUCTS
 ########################################
 
-# Display product
-
 
 @app.route('/catalog/<category_name>/<product_name>', methods=['GET', 'POST'])
 def showProduct(category_name, product_name):
+    '''Display product'''
     category = session.query(Category).filter_by(name=category_name).first()
     product = session.query(Product).filter_by(
         name=product_name, category_id=category.id).first()
@@ -436,7 +433,7 @@ def showProduct(category_name, product_name):
         product_id=product.id).first()
     # Determine if logged in user is product owner
     if 'username' in login_session and \
-        product.user_id == login_session['user_id']:
+            product.user_id == login_session['user_id']:
         user_can_edit = 1
     else:
         user_can_edit = 0
@@ -447,11 +444,10 @@ def showProduct(category_name, product_name):
                            user_can_edit=user_can_edit,
                            productPhoto=productPhoto)
 
-# Create a new product
-
 
 @app.route('/catalog/<category_name>/new', methods=['GET', 'POST'])
 def newProduct(category_name):
+    '''Create a new product'''
     categories = session.query(Category).order_by(Category.name).all()
     preselected_category = session.query(
         Category).filter_by(name=category_name).first()
@@ -513,9 +509,9 @@ def newProduct(category_name):
                                preselected_category=preselected_category)
 
 
-# Edit product
 @app.route('/catalog/<product_name>/edit', methods=['GET', 'POST'])
 def editProduct(product_name):
+    '''Edit product'''
     product = session.query(Product).filter_by(name=product_name).first()
     category = session.query(Category) \
                       .filter_by(name=product.category.name) \
@@ -586,11 +582,10 @@ def editProduct(product_name):
         flash("You do not have permission to edit this product.", "danger")
         return redirect(url_for('showCatalog'))
 
-# Delete product
-
 
 @app.route('/catalog/<product_name>/delete', methods=['GET', 'POST'])
 def deleteProduct(product_name):
+    '''Delete product'''
     product = session.query(Product).filter_by(name=product_name).first()
     category = session.query(Category).filter_by(
         name=product.category.name).first()
