@@ -93,7 +93,6 @@ class ProductPhoto(Base):
            'id'         : self.id,
        }
 
-#engine = create_engine('sqlite:///restaurantmenuwithusers.db')
 engine = create_engine('postgresql+psycopg2:///mystore')
 
 
